@@ -1,0 +1,23 @@
+body{
+    background-color: darkcyan !important;
+}
+header {
+    height: 50px;
+}
+footer {
+    text-align: center;
+}
+footer a {
+    color: white;
+}
+legend {
+    text-align: center;
+}
+.jumbotron {
+    background-color: lightgray !important;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
