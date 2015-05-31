@@ -16,8 +16,13 @@ legend {
 .jumbotron {
     background-color: lightgray !important;
 }
+/**Delete spinner to Crhome*/
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+/**Delete spinner to Firefox*/
+input[type=number] {
+-moz-appearance: textfield;
 }

@@ -1,13 +1,11 @@
-package service;
+package service.instances;
 
+import service.ILoginService;
 import model.dao.UserDAO;
 import model.dts.UserDTO;
 import model.interfaces.IAbstractFactoryModel;
+import service.ILoginService;
 
-/**
- *
- * @author Febo
- */
 public class LoginService implements ILoginService{
     private IAbstractFactoryModel userDAO;
     private UserDTO userDTO;

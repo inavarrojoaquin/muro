@@ -16,7 +16,7 @@ BEGIN
 	 SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	select a.id_usuario, p.nombre, p.apellido
+	select a.id_usuario, p.nombre, p.apellido, a.id_rol
 	from AccesoUsuario a join Persona p
 		on a.dni_persona = p.dni_persona
 	where a.id_usuario = @usuario

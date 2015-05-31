@@ -13,8 +13,7 @@ public class UserDTO {
     private String nombre;
     private String apellido;
     
-    public UserDTO() {
-    }
+    public UserDTO() {}
     
     public UserDTO(String id_usuario) {
         this.id_usuario = id_usuario;
@@ -25,10 +24,11 @@ public class UserDTO {
         this.password = password;
     }
     
-    public UserDTO(String id_usuario, String nombre, String apellido) {
+    public UserDTO(String id_usuario, String nombre, String apellido, Short id_rol) {
         this.id_usuario = id_usuario;
         this.nombre = nombre;
         this.apellido = apellido;
+        this.id_rol = id_rol;
     }
 
     public UserDTO(String id_usuario, String password, String dni_persona, short id_rol, String fecha_acceso, String nombre, String apellido) {

@@ -14,4 +14,5 @@ public interface IAbstractFactoryModel <Anything, T>{
     
     public Anything select(Anything a);
     public List<Anything> selectAll();
+    public List<Anything> selectAll(List<T> a);
 }

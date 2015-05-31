@@ -94,6 +94,12 @@ where cm.id_carrera = 1
  and p.id_rol = 3
 go
 
+/** Testing
+insert into AlumnosCarMateria(id_carrera,id_materia,dni_alumno,id_rol)
+values (2,3,'555',3)
+go
+*/
+
 insert into AccesoUsuario(id_usuario,password,dni_persona,id_rol)
 select pr.dni_persona as id_usuario,pr.dni_persona as password,pr.dni_persona,pr.id_rol
 from PersonaRol pr 
@@ -138,7 +144,7 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	select distinct nombre from AccesoUsuario au join AlumnosCarMateria ac on au.dni_persona = ac.dni_alumno
+	select distinct c.id_carrera,c.nombre from AccesoUsuario au join AlumnosCarMateria ac on au.dni_persona = ac.dni_alumno
 	join Carrera c on ac.id_carrera = c.id_carrera
 	where au.id_usuario = @usuario
 
@@ -151,8 +157,8 @@ GO
 /*Retorna las materias de un alumno en una carrera*/
 CREATE PROCEDURE proc_getMateriaCarreraUsuario
 	-- Add the parameters for the stored procedure here
-	@carrera varchar(20),
-	@usuario varchar(10)
+	@usuario varchar(10),
+	@carrera varchar(50)
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -160,7 +166,7 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	select m.nombre 
+	select m.id_materia, m.nombre, *
 	from AccesoUsuario au join AlumnosCarMateria ac on au.dni_persona = ac.dni_alumno
 	join Carrera c on ac.id_carrera = c.id_carrera
 	join Materia m on ac.id_materia = m.id_materia

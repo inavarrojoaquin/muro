@@ -1,2 +1,2 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%  response.sendRedirect("views/login.jsp"); %>
+<%  response.sendRedirect("login.jsp"); %>
