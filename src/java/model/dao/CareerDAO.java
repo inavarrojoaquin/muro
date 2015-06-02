@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.connection.ConnectDB;
-import model.dts.CareerDTO;
+import model.dto.CareerDTO;
 import model.interfaces.IAbstractFactoryModel;
 
 public class CareerDAO implements IAbstractFactoryModel<CareerDTO, String>{

@@ -6,14 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 import model.dao.CareerDAO;
 import model.dao.UserDAO;
-import model.dts.CareerDTO;
-import model.dts.SubjectDTO;
-import model.dts.UserDTO;
+import model.dto.CareerDTO;
+import model.dto.SubjectDTO;
+import model.dto.UserDTO;
+import model.dto.WallDTO;
 import service.instances.CareerService;
 import service.ILoginService;
 import service.AbstractMuroService;
 import service.instances.LoginService;
 import service.instances.SubjectService;
+import service.instances.WallService;
 
 /**
  *
@@ -43,16 +45,29 @@ public class Prueba {
 //
 //        }
         
-        AbstractMuroService subject = new SubjectService();
-        List<String> lista = new ArrayList();
-        lista.add("555");
-        lista.add("INGENIERIA INFORMATICA");
+//        AbstractMuroService subject = new SubjectService();
+//        List<String> lista = new ArrayList();
+//        lista.add("555");
+//        lista.add("INGENIERIA INFORMATICA");
+//        
+//        List<SubjectDTO> listSubject = subject.get(lista);
+//        for (Iterator<SubjectDTO> iterator = listSubject.iterator(); iterator.hasNext();) {
+//            SubjectDTO next = iterator.next();
+//            System.out.println("IdMateria: " + next.getId_materia());
+//            System.out.println("NombreMateria: " + next.getNombre());
+//
+//        }
         
-        List<SubjectDTO> listSubject = subject.get(lista);
-        for (Iterator<SubjectDTO> iterator = listSubject.iterator(); iterator.hasNext();) {
-            SubjectDTO next = iterator.next();
-            System.out.println("IdMateria: " + next.getId_materia());
-            System.out.println("NombreMateria: " + next.getNombre());
+        AbstractMuroService wall = new WallService();
+        List<String> lista = new ArrayList();
+        lista.add("1");
+        lista.add("1");
+        
+        List<WallDTO> listWall = wall.get(lista);
+        for (Iterator<WallDTO> iterator = listWall.iterator(); iterator.hasNext();) {
+            WallDTO next = iterator.next();
+            System.out.println("Id_muro: " + next.getId_muro());
+            System.out.println("Fecha_creacion: " + next.getFecha_creacion());
 
         }
                

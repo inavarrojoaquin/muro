@@ -8,23 +8,23 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.connection.ConnectDB;
-import model.dto.SubjectDTO;
+import model.dto.WallDTO;
 import model.interfaces.IAbstractFactoryModel;
 
-public class SubjectDAO implements IAbstractFactoryModel<SubjectDTO, String>{
+public class WallDAO implements IAbstractFactoryModel<WallDTO, String>{
 
-    private static final String SQL_SELECTALL = "{ call proc_getMateriaCarreraUsuario(?, ?) }"; //id_usuario, carrera. return materia's name
+    private static final String SQL_SELECTALL = "{ call proc_getMuro(?, ?) }"; //id_carrera, id_materia. return id_muro
     
     private static final ConnectDB conn = ConnectDB.getInstance(); //use singleton
     private PreparedStatement ps;
     private ResultSet rs;
-    private SubjectDTO subject;
-    private List<SubjectDTO> list;
+    private WallDTO wall;
+    private List<WallDTO> list;
     
     @Override
-    public List<SubjectDTO> selectAll(List<String> a) {
+    public List<WallDTO> selectAll(List<String> a) {
         try {
-            subject = null;
+            wall = null;
             list = null;
             ps = conn.getConnection().prepareStatement(SQL_SELECTALL);
             ps.setObject(1, a.get(0));
@@ -35,28 +35,33 @@ public class SubjectDAO implements IAbstractFactoryModel<SubjectDTO, String>{
                 if(list == null){
                     list = new ArrayList();
                 }
-                subject = new SubjectDTO(rs.getShort("id_materia"), rs.getString("nombre"));
-                list.add(subject);
+                wall = new WallDTO(rs.getShort("id_muro"), rs.getString("fecha_creacion"));
+                list.add(wall);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CareerDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 conn.closeConnection();
             } catch (SQLException ex) {
-                Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(CareerDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return list;
     }
     
     @Override
-    public boolean insert(SubjectDTO a) {
+    public WallDTO select(WallDTO a) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.   
+    }
+    
+    @Override
+    public boolean insert(WallDTO a) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean update(SubjectDTO a) {
+    public boolean update(WallDTO a) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -66,12 +71,7 @@ public class SubjectDAO implements IAbstractFactoryModel<SubjectDTO, String>{
     }
 
     @Override
-    public SubjectDTO select(SubjectDTO a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<SubjectDTO> selectAll() {
+    public List<WallDTO> selectAll() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

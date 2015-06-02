@@ -12,53 +12,48 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import model.dto.SubjectDTO;
+import model.dto.WallDTO;
 import service.AbstractMuroService;
-import service.instances.SubjectService;
+import service.instances.WallService;
 
-@WebServlet(name = "SubjectServlet", urlPatterns = {"/subject.do"})
-public class SubjectServlet extends HttpServlet {
-    AbstractMuroService subjectService;
-    HttpSession session;
+@WebServlet(name = "WallServlet", urlPatterns = {"/wall.do"})
+public class WallServlet extends HttpServlet {
+    private AbstractMuroService wallService;
 
-    public SubjectServlet() {
-        subjectService = new SubjectService();
+    public WallServlet() {
+        wallService = new WallService();
     }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        session = request.getSession();
-        String id_usuario = (String)session.getAttribute("id_user");
-        String nombre = (String)request.getParameter("name");
+        String id_career = request.getParameter("id_career");
+        String id_subject = request.getParameter("id_subject");
         
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         
-        Type listType = new TypeToken<List<SubjectDTO>>(){}.getType();        
+        Type listType = new TypeToken<List<WallDTO>>(){}.getType();        
         Gson gson = new GsonBuilder().serializeNulls().create();
         
         String representacionJSON = "";
         List<String> list = new ArrayList();
-        list.add(id_usuario);
-        list.add(nombre);
+        list.add(id_career);
+        list.add(id_subject);
         
-        List<SubjectDTO> subjectList = subjectService.get(list);
-        if (subjectList != null) {
-            representacionJSON = gson.toJson(subjectList, listType);   
+        List<WallDTO> wallList = wallService.get(list);
+        if (wallList != null) {
+            representacionJSON = gson.toJson(wallList, listType);   
         }
         response.getWriter().write(gson.toJson(representacionJSON));
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-    }
+            throws ServletException, IOException {}
 
     @Override
     public String getServletInfo() {
-        return "Subject Servlet";
+        return "Wall Servlet";
     }// </editor-fold>
-
 }

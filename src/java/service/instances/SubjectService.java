@@ -2,7 +2,7 @@ package service.instances;
 
 import java.util.List;
 import model.dao.SubjectDAO;
-import model.dts.SubjectDTO;
+import model.dto.SubjectDTO;
 import model.interfaces.IAbstractFactoryModel;
 import service.AbstractMuroService;
 

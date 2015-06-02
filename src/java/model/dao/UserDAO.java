@@ -1,7 +1,7 @@
 package model.dao;
 
 import model.connection.ConnectDB;
-import model.dts.UserDTO;
+import model.dto.UserDTO;
 import model.interfaces.IAbstractFactoryModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
