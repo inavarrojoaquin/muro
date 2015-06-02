@@ -2,7 +2,7 @@
 ## Netbeans
 #################
 
-nbproject/private/*
+nbproject/*
 build/*
 dist/*
 *.xml
