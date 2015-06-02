@@ -144,7 +144,8 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	select distinct c.id_carrera,c.nombre from AccesoUsuario au join AlumnosCarMateria ac on au.dni_persona = ac.dni_alumno
+	select distinct c.id_carrera,c.nombre 
+	from AccesoUsuario au join AlumnosCarMateria ac on au.dni_persona = ac.dni_alumno
 	join Carrera c on ac.id_carrera = c.id_carrera
 	where au.id_usuario = @usuario
 
@@ -175,6 +176,29 @@ BEGIN
 	
 END
 GO
+
+IF OBJECT_ID ('proc_getMuro') IS NOT NULL
+   DROP PROCEDURE proc_getMuro
+GO
+/*Retorna el muro correspondiente a una carrera-materia*/
+CREATE PROCEDURE proc_getMuro
+	-- Add the parameters for the stored procedure here
+	@id_carrera tinyint,
+	@id_materia tinyint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+    -- Insert statements for procedure here
+	select m.id_muro, m.fecha_creacion
+	from Muro m
+	where m.id_carrera = @id_carrera
+		and m.id_materia = @id_materia
+		and m.habilitado = 1
+END
+go
 
 IF OBJECT_ID ('proc_getPublicacionesMuro') IS NOT NULL
    DROP PROCEDURE proc_getPublicacionesMuro

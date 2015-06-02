@@ -27,6 +27,7 @@
             <div class="error"></div>
         </nav>
         <section>
+            <p id="id_muro"></p>
             <article>
                 <h1>Publication 1</h1>
                 <p id="comment">Comentarios para la publicacion 1</p>

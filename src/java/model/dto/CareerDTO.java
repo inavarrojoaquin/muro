@@ -1,4 +1,4 @@
-package model.dts;
+package model.dto;
 
 public class CareerDTO {
     private short id_carrera;

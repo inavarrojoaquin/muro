@@ -8,16 +8,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.dts.UserDTO;
+import model.dto.UserDTO;
 import service.ILoginService;
 import service.instances.LoginService;
 
 @WebServlet (name="LoginController", urlPatterns = {"/login.do"})
-public class LoginController extends HttpServlet {
+public class LoginServlet extends HttpServlet {
     private ILoginService loginService;
     private HttpSession session;
     
-    public LoginController() {
+    public LoginServlet() {
         loginService = new LoginService();
     }
     

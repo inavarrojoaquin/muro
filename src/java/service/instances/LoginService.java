@@ -2,7 +2,7 @@ package service.instances;
 
 import service.ILoginService;
 import model.dao.UserDAO;
-import model.dts.UserDTO;
+import model.dto.UserDTO;
 import model.interfaces.IAbstractFactoryModel;
 import service.ILoginService;
 

@@ -1,4 +1,4 @@
-package model.dts;
+package model.dto;
 
 public class SubjectDTO {
     private short id_materia;

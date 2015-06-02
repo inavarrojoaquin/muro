@@ -1,4 +1,4 @@
-package model.dts;
+package model.dto;
 
 
 /**

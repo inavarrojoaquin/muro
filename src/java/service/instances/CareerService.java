@@ -3,7 +3,7 @@ package service.instances;
 import java.util.ArrayList;
 import java.util.List;
 import model.dao.CareerDAO;
-import model.dts.CareerDTO;
+import model.dto.CareerDTO;
 import model.interfaces.IAbstractFactoryModel;
 import service.AbstractMuroService;
 
