@@ -17,6 +17,8 @@ import service.instances.CareerService;
 
 @WebServlet(name = "CareerServlet", urlPatterns = {"/career.do"})
 public class CareerServlet extends HttpServlet {
+    private CareerService careerService;
+    private HttpSession session;
 
     public CareerServlet() {
         this.careerService = new CareerService();
@@ -28,9 +30,21 @@ public class CareerServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         
-        Type listType = new TypeToken<List<CareerDTO>>(){}.getType();        
-        Gson gson = new GsonBuilder().serializeNulls().create();
+        session = request.getSession();
+        String id_usuario = (String)session.getAttribute("id_user");
         
+        if(id_usuario != null){
+            Type listType = new TypeToken<List<CareerDTO>>(){}.getType();        
+            Gson gson = new GsonBuilder().serializeNulls().create();
+
+            String representacionJSON;
+            List<CareerDTO> careerList = careerService.getCareersByIdUser(id_usuario);
+            if (careerList != null) {
+                representacionJSON = gson.toJson(careerList, listType);
+            }else {
+                representacionJSON = " {\"error\":\"No hay carreras para mostrar\"} ";
+            }
+            response.getWriter().write(representacionJSON);
         }
     }
 

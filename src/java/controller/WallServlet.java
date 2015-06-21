@@ -18,6 +18,7 @@ import service.instances.WallService;
 
 @WebServlet(name = "WallServlet", urlPatterns = {"/wall.do"})
 public class WallServlet extends HttpServlet {
+    private WallService wallService;
 
     public WallServlet() {
         wallService = new WallService();
@@ -29,10 +30,30 @@ public class WallServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         
+        String id_career = request.getParameter("id_career");
+        String id_subject = request.getParameter("id_subject");
+        String enable = request.getParameter("enable");
+        String representacionJSON; 
         
-        List<WallDTO> wallList = wallService.get(list);
-        if (wallList != null) {
-            representacionJSON = gson.toJson(wallList, listType);   
+        if(id_career != null && id_subject != null && enable == null){
+            Type type = new TypeToken<WallDTO>(){}.getType();        
+            Gson gson = new GsonBuilder().serializeNulls().create();
+            
+            WallDTO wall = wallService.getMuro(Short.parseShort(id_career), Short.parseShort(id_subject));
+            if (wall != null) {
+                representacionJSON = gson.toJson(wall, type);   
+            }else {
+                representacionJSON = " {\"error\":\"No se encontro el muro\" } ";
+            }
+            response.getWriter().write(representacionJSON);
+        }else {
+            boolean enableOk = wallService.enableDisabledMuro(Short.parseShort(id_career), Short.parseShort(id_subject), Boolean.parseBoolean(enable));
+            if (enableOk) {
+                representacionJSON = " {\"mensaje\":\"Muro habiltado-deshabilitado correctamente\"} ";
+            }else {
+                representacionJSON = " {\"error\":\"Error, no se pudo habilitar-deshabilitar el muro\" } ";
+            }
+            response.getWriter().write(representacionJSON);
         }
     }
 

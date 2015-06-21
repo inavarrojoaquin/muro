@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 import model.connection.ConnectDB;
 import model.dto.CareerDTO;
 
+public class CareerDAO {
 
+    private static final String SQL_SELECT_CAREERS = "{ call proc_getCarreraPorUsuario(?) }"; //id_usuario. return career's name
     
     private static final ConnectDB conn = ConnectDB.getInstance(); //use singleton
     private PreparedStatement ps;
@@ -18,9 +20,12 @@ import model.dto.CareerDTO;
     private CareerDTO career;
     private List<CareerDTO> list;
 
+    public List<CareerDTO> getCareersByIdUser(String id_user) {
         try {
             career = null;
             list = null;
+            ps = conn.getConnection().prepareStatement(SQL_SELECT_CAREERS);
+            ps.setString(1, id_user);
             
             rs = ps.executeQuery();
             while(rs.next()){

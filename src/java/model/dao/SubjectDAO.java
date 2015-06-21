@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 import model.connection.ConnectDB;
 import model.dto.SubjectDTO;
 
+public class SubjectDAO {
 
+    private static final String SQL_SELECT_SUBJECTS = "{ call proc_getMateriaCarreraUsuario(?, ?) }"; //id_usuario, id_career. return materia's name
     
     private static final ConnectDB conn = ConnectDB.getInstance(); //use singleton
     private PreparedStatement ps;
@@ -18,9 +20,13 @@ import model.dto.SubjectDTO;
     private SubjectDTO subject;
     private List<SubjectDTO> list;
     
+    public List<SubjectDTO> selectAllSubjects(String id_user, short id_career) {
         try {
             subject = null;
             list = null;
+            ps = conn.getConnection().prepareStatement(SQL_SELECT_SUBJECTS);
+            ps.setString(1, id_user);
+            ps.setShort(2, id_career);
             
             rs = ps.executeQuery();
             while(rs.next()){

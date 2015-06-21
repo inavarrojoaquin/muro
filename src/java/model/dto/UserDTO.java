@@ -16,6 +16,7 @@ public class UserDTO {
     
     public UserDTO(String id_usuario, String nombre){
         this.id_usuario = id_usuario;
+        this.nombre = nombre;
     }
     
     public UserDTO(String id_usuario, String nombre, String apellido, Short id_rol) {
