@@ -6,10 +6,6 @@ public class WallDTO {
 
     public WallDTO() {}
 
-    public WallDTO(short id_muro) {
-        this.id_muro = id_muro;
-    }
-
     public WallDTO(short id_muro, String fecha_creacion) {
         this.id_muro = id_muro;
         this.fecha_creacion = fecha_creacion;

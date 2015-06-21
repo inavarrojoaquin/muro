@@ -1,5 +1,3 @@
-<% if(session.getAttribute("user") != null) response.sendRedirect("login.jsp"); %>
-<% String error = (String)session.getAttribute("error"); %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>

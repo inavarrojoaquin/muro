@@ -25,7 +25,6 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         session = request.getSession();
-        if(session.getAttribute("user") != null){
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("muro.jsp");
             dispatcher.forward(request,response);
         }
@@ -34,15 +33,11 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String id_usuario = request.getParameter("idusuario");
         String password = request.getParameter("password");
 
         session = request.getSession();
-        UserDTO userDTO = loginService.login(id_usuario, password);
      
-        if (userDTO != null) {
             session.setAttribute("id_user", userDTO.getIdUsuario());
-            session.setAttribute("user", userDTO.getNombre());
             session.setAttribute("id_rol", userDTO.getIdRol());
 //            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/muro.jsp");
 //            dispatcher.forward(request,response);

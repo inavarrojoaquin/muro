@@ -9,11 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.connection.ConnectDB;
 import model.dto.CareerDTO;
-import model.interfaces.IAbstractFactoryModel;
 
-public class CareerDAO implements IAbstractFactoryModel<CareerDTO, String>{
 
-    private static final String SQL_SELECTALL = "{ call proc_getCarreraPorUsuario(?) }"; //id_usuario. return career's name
     
     private static final ConnectDB conn = ConnectDB.getInstance(); //use singleton
     private PreparedStatement ps;
@@ -21,13 +18,9 @@ public class CareerDAO implements IAbstractFactoryModel<CareerDTO, String>{
     private CareerDTO career;
     private List<CareerDTO> list;
 
-    @Override
-    public List<CareerDTO> selectAll(List<String> a) {
         try {
             career = null;
             list = null;
-            ps = conn.getConnection().prepareStatement(SQL_SELECTALL);
-            ps.setObject(1, a.get(0));
             
             rs = ps.executeQuery();
             while(rs.next()){
@@ -47,30 +40,5 @@ public class CareerDAO implements IAbstractFactoryModel<CareerDTO, String>{
             }
         }
         return list;
-    }
-    
-    @Override
-    public CareerDTO select(CareerDTO a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    @Override
-    public boolean insert(CareerDTO a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean update(CareerDTO a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean delete(String key) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<CareerDTO> selectAll() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

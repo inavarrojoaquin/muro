@@ -9,11 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.connection.ConnectDB;
 import model.dto.SubjectDTO;
-import model.interfaces.IAbstractFactoryModel;
 
-public class SubjectDAO implements IAbstractFactoryModel<SubjectDTO, String>{
 
-    private static final String SQL_SELECTALL = "{ call proc_getMateriaCarreraUsuario(?, ?) }"; //id_usuario, carrera. return materia's name
     
     private static final ConnectDB conn = ConnectDB.getInstance(); //use singleton
     private PreparedStatement ps;
@@ -21,14 +18,9 @@ public class SubjectDAO implements IAbstractFactoryModel<SubjectDTO, String>{
     private SubjectDTO subject;
     private List<SubjectDTO> list;
     
-    @Override
-    public List<SubjectDTO> selectAll(List<String> a) {
         try {
             subject = null;
             list = null;
-            ps = conn.getConnection().prepareStatement(SQL_SELECTALL);
-            ps.setObject(1, a.get(0));
-            ps.setObject(2, a.get(1));
             
             rs = ps.executeQuery();
             while(rs.next()){
@@ -48,30 +40,5 @@ public class SubjectDAO implements IAbstractFactoryModel<SubjectDTO, String>{
             }
         }
         return list;
-    }
-    
-    @Override
-    public boolean insert(SubjectDTO a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean update(SubjectDTO a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean delete(String key) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public SubjectDTO select(SubjectDTO a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<SubjectDTO> selectAll() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

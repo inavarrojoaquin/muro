@@ -18,7 +18,6 @@ import service.instances.WallService;
 
 @WebServlet(name = "WallServlet", urlPatterns = {"/wall.do"})
 public class WallServlet extends HttpServlet {
-    private AbstractMuroService wallService;
 
     public WallServlet() {
         wallService = new WallService();
@@ -27,25 +26,14 @@ public class WallServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String id_career = request.getParameter("id_career");
-        String id_subject = request.getParameter("id_subject");
-        
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         
-        Type listType = new TypeToken<List<WallDTO>>(){}.getType();        
-        Gson gson = new GsonBuilder().serializeNulls().create();
-        
-        String representacionJSON = "";
-        List<String> list = new ArrayList();
-        list.add(id_career);
-        list.add(id_subject);
         
         List<WallDTO> wallList = wallService.get(list);
         if (wallList != null) {
             representacionJSON = gson.toJson(wallList, listType);   
         }
-        response.getWriter().write(gson.toJson(representacionJSON));
     }
 
     @Override

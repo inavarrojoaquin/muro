@@ -13,13 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import model.dto.CareerDTO;
-import service.AbstractMuroService;
 import service.instances.CareerService;
 
 @WebServlet(name = "CareerServlet", urlPatterns = {"/career.do"})
 public class CareerServlet extends HttpServlet {
-    AbstractMuroService careerService;
-    HttpSession session;
 
     public CareerServlet() {
         this.careerService = new CareerService();
@@ -28,20 +25,13 @@ public class CareerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        session = request.getSession();
-        String id_usuario = (String)session.getAttribute("id_user");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         
         Type listType = new TypeToken<List<CareerDTO>>(){}.getType();        
         Gson gson = new GsonBuilder().serializeNulls().create();
         
-        String representacionJSON = "";
-        List<CareerDTO> careerList = careerService.get(id_usuario);
-        if (careerList != null) {
-            representacionJSON = gson.toJson(careerList, listType);   
         }
-        response.getWriter().write(gson.toJson(representacionJSON)); 
     }
 
     @Override
@@ -60,7 +50,4 @@ public class CareerServlet extends HttpServlet {
     public String getServletInfo() {
         return "Career Servlet";
     }// </editor-fold>
-
-    
-
 }
