@@ -252,6 +252,7 @@ function callback_error(XMLHttpRequest, textStatus, errorThrown){
 }
 
 /** Ejemplos de acceso
+/** Ejemplos...para probar
  * <input type="hidden" id="foo" name="zyx" value="bar" />
 
     alert($('input#foo').val());
