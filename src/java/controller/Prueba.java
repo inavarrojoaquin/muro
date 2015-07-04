@@ -7,6 +7,7 @@ import java.util.List;
 import model.dao.CareerDAO;
 import model.dao.UserDAO;
 import model.dto.CareerDTO;
+import model.dto.CommentDTO;
 import model.dto.PublicationDTO;
 import model.dto.SubjectDTO;
 import model.dto.UserDTO;
@@ -14,6 +15,7 @@ import model.dto.WallDTO;
 import service.instances.CareerService;
 import service.ILoginService;
 import service.AbstractMuroService;
+import service.instances.CommentService;
 import service.instances.LoginService;
 import service.instances.PublicationService;
 import service.instances.SubjectService;
@@ -81,12 +83,23 @@ public class Prueba {
 //            System.out.println("La publicacion de inserto correctamente");
 //        }
         
-        PublicationService publicationService = new PublicationService();
-        boolean ok = publicationService.enableDisablePublication(1003, false);
-        if(ok){
-            System.out.println("Ok");
+//        PublicationService publicationService = new PublicationService();
+//        boolean ok = publicationService.enableDisablePublication(1003, false);
+//        if(ok){
+//            System.out.println("Ok");
+//        }else{
+//            System.out.println("error");
+//        }
+        
+        CommentService commentService = new CommentService();
+        List<CommentDTO> commentList = commentService.getCommentsByPublication(2);
+        if(commentList != null){
+            for(CommentDTO comment : commentList){
+                System.out.println("Datos: "+ comment.getTexto());
+            }
+            
         }else{
-            System.out.println("error");
+            System.out.println("No hay datos...");
         }
                
     }

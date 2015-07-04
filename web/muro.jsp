@@ -8,7 +8,7 @@
         
         <%--<link rel="stylesheet" href="css/my-css/main.css">--%>
         <script src="js/jquery.2.1.4.js" type="text/javascript"></script>
-        <script src="js/my-script/script.js"  type="text/javascript"></script>
+        <script src="js/my-script/new-script.js"  type="text/javascript"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1">  <%--Boostrap init--%>
         <script src="js/bootstrap.min.js" type="text/javascript"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
@@ -23,7 +23,7 @@
             <a href="logout.do">Logout</a><br/>
         </header>
         <nav>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:8080/muro/login.jsp" target="_blank">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:8080/muro/muro.jsp#1008" target="_blank">
                <img src="https://lh3.googleusercontent.com/-H8xMuAxM-bE/UefWwJr2vwI/AAAAAAAAEdY/N5I41q19KMk/s32-no/facebook.png">
             </a>
             <a href="http://www.twitter.com/home?status=http://localhost:8080/muro/login.jsp" target="_blank">
@@ -35,7 +35,7 @@
             <div class="success"></div>
         </nav>
         <section>
-            <div id="insertPublication">
+            <div id="insertPublication" style='display:none;'>
                 <form>
                     <p>Publicar contenido</p>
                     <textarea id="contentPublication"></textarea><br>

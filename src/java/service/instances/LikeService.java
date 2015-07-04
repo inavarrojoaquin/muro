@@ -21,7 +21,7 @@ private LikeDAO likeDAO;
         return likeDAO.getAllUsersByPublicationLike(id_publication);
     }
     
-    //insert like
+    //insert like and update variable like in the publication's table using the trigger
     public boolean insertLike(String id_user, int id_publication){
         return likeDAO.insertLike(id_user, id_publication);
     }    

@@ -16,6 +16,11 @@ public class PublicationService{
         return publicationDAO.getPublications(id_muro);
     }
     
+    //getPublications before date
+    public List<PublicationDTO> getPublicationsBeforeDate(short id_muro, String date) {
+        return publicationDAO.getPublicationsBeforeDate(id_muro, date);
+    }
+    
     //insert publication
     public boolean insertPublication(String texto, short id_muro, String id_user){
         return publicationDAO.insertPublication(texto, id_muro, id_user);

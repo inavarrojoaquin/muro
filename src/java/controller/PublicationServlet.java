@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
+import static java.lang.System.console;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
@@ -35,12 +36,13 @@ public class PublicationServlet extends HttpServlet {
         
         String id_wall = request.getParameter("id_wall");
         String id_user = request.getParameter("id_user");
+        String endDatePublication = request.getParameter("endDatePublication");
+        
+        Type listType = new TypeToken<List<PublicationDTO>>(){}.getType();        
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        String representacionJSON;
         
         if(id_wall != null && id_user != null){
-            Type listType = new TypeToken<List<PublicationDTO>>(){}.getType();        
-            Gson gson = new GsonBuilder().serializeNulls().create();
-            
-            String representacionJSON;
             List<PublicationDTO> publicationList = publicationService.getPublications(Short.parseShort(id_wall));
             if (publicationList != null) {
                 List<LikeDTO> listaLike = likeService.getUserLike(id_user);
@@ -57,6 +59,15 @@ public class PublicationServlet extends HttpServlet {
                 representacionJSON = gson.toJson(publicationList, listType);
             }else {
                 representacionJSON = "{ \"error\":\"La materia seleccionada no tiene publicaciones para mostrar\" }";
+            }
+            response.getWriter().write(representacionJSON);
+        }
+        if(id_wall != null && endDatePublication != null){
+            List<PublicationDTO> top5PublicationList = publicationService.getPublicationsBeforeDate(Short.parseShort(id_wall), endDatePublication);
+            if(top5PublicationList != null){
+                representacionJSON = gson.toJson(top5PublicationList, listType);
+            }else {
+                representacionJSON = "{ \"error\":\"No existen nuevas publicaciones\" }";
             }
             response.getWriter().write(representacionJSON);
         }
@@ -100,7 +111,7 @@ public class PublicationServlet extends HttpServlet {
         String enablePublication = request.getParameter("enable");
        
         if(id_publication != null && id_user != null){
-            /**Insert like in the table and update like variable in the publication table*/
+            /**Insert like in the table and update like variable in the publication's table using trigger*/
             boolean updateOk = likeService.insertLike(id_user, Integer.parseInt(id_publication));
             if(updateOk){
                 response.getWriter().write("{\"mensaje\":\"Actualizacion de Likes en publicacion correcta\"}");

@@ -289,7 +289,32 @@ BEGIN
 	where p.id_muro = @muro
 	 and p.habilitado = 1
 	 and p.eliminado = 0
-	 order by p.fecha_publicacion DESC
+END
+GO
+
+IF OBJECT_ID ('proc_getPublicacionesMuroAfterDate') IS NOT NULL
+   DROP PROCEDURE proc_getPublicacionesMuroAfterDate
+GO
+/*Retorna las 5 publicaciones de un determinado muro posteriores a la fecha ingresada*/
+CREATE PROCEDURE proc_getPublicacionesMuroAfterDate
+	-- Add the parameters for the stored procedure here
+	@muro tinyint,
+	@fecha varchar(20)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+    -- Insert statements for procedure here
+	select top 5 p.id_publicacion, p.texto, p.likes, p.id_usuario, pe.nombre, p.fecha_publicacion
+	from Publicacion p 
+	join AccesoUsuario au on p.id_usuario = au.id_usuario
+	join Persona pe on au.dni_persona = pe.dni_persona
+	where p.id_muro = @muro
+	and p.fecha_publicacion > @fecha
+	 and p.habilitado = 1
+	 and p.eliminado = 0
 END
 GO
 
@@ -416,34 +441,13 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	if exists(select p.id_usuario, p.id_publicacion
+	if exists(select *
 			from Publicacion p
 			where p.id_publicacion = @id_publicacion)
 		insert into [dbo].[Like](id_usuario, id_publicacion)
 		values (@id_usuario, @id_publicacion)
 	else 
 		raiserror ('Error, no se pudo insertar el Like', 16, 1)
-		
-END
-GO
-
-IF OBJECT_ID ('proc_updateLikePublicacion') IS NOT NULL
-   DROP PROCEDURE proc_updateLikePublicacion
-GO
-/*Actualiza el atributo 'like += 1' a una publicacion de un determinado muro*/
-CREATE PROCEDURE proc_updateLikePublicacion
-	-- Add the parameters for the stored procedure here
-	@id_publicacion int
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT OFF;
-
-    -- Insert statements for procedure here
-	update Publicacion
-	set likes += 1
-	where id_publicacion = @id_publicacion
 END
 GO
 
@@ -472,5 +476,90 @@ BEGIN
 		rollback transaction
 	  end
 
+END
+GO
+
+IF OBJECT_ID ('proc_updateLikePublicacion') IS NOT NULL
+   DROP PROCEDURE proc_updateLikePublicacion
+GO
+/*Actualiza el atributo 'like += 1' a una publicacion de un determinado muro*/
+CREATE PROCEDURE proc_updateLikePublicacion
+	-- Add the parameters for the stored procedure here
+	@id_publicacion int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+    -- Insert statements for procedure here
+	update Publicacion
+	set likes += 1
+	where id_publicacion = @id_publicacion
+END
+GO
+
+IF OBJECT_ID ('proc_getAllCommentsByPublication') IS NOT NULL
+   DROP PROCEDURE proc_getAllCommentsByPublication
+GO
+/*Retorna todos los comentarios de una publicacion*/
+CREATE PROCEDURE proc_getAllCommentsByPublication
+	-- Add the parameters for the stored procedure here
+	@id_publicacion int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+    -- Insert statements for procedure here
+	select c.id_comentario, c.texto, c.id_publicacion, p.nombre, p.apellido, c.fecha_creacion
+	from Comentario c
+	join AccesoUsuario au on au.id_usuario = c.id_usuario
+	join Persona p on p.dni_persona = au.dni_persona
+	where c.id_publicacion = @id_publicacion
+	and c.habilitado = 1
+	and c.eliminado = 0
+END
+GO
+
+IF OBJECT_ID ('proc_insertCommentInPublication') IS NOT NULL
+   DROP PROCEDURE proc_insertCommentInPublication
+GO
+/*Inserta un comentario a una determinada publicacion*/
+CREATE PROCEDURE proc_insertCommentInPublication
+	-- Add the parameters for the stored procedure here
+	@texto varchar(150),
+	@id_usuario varchar(10),
+	@id_publicacion int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+    -- Insert statements for procedure here
+	insert into Comentario(texto,id_usuario,id_publicacion)
+	values	(@texto, @id_usuario, @id_publicacion)
+END
+GO
+
+IF OBJECT_ID ('proc_deleteComment') IS NOT NULL
+   DROP PROCEDURE proc_deleteComment
+GO
+/*Actualiza el atributo 'eliminado = 1' de un comentario */
+CREATE PROCEDURE proc_deleteComment
+	-- Add the parameters for the stored procedure here
+	@id_comentario int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+    -- Insert statements for procedure here
+	update Comentario
+	set eliminado = 1
+	where id_publicacion = @id_comentario
 END
 GO

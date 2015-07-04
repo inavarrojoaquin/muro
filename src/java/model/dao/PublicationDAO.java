@@ -12,10 +12,10 @@ import model.dto.PublicationDTO;
 
 public class PublicationDAO {
     private static final String SQL_SELECT_PUBLICATIONS = "{ call proc_getPublicacionesMuro(?) }";//id_muro - retorna id_publicacion,texto,likes,fecha_publicacion
+    private static final String SQL_SELECT_PUBLICATIONS_BEFORE_DATE = "{ call proc_getPublicacionesMuroAfterDate(?, ?) }"; //id_muro, fecha - retorna las publicaciones posteriores a esa fecha
     private static final String SQL_INSERT_PUBLICATION = "{ call proc_insertPublicacion(?, ?, ?) }";//texto, id_muro, id_usuario - inserta publicacion
     private static final String SQL_DELETE_PUBLICATION = "{ call proc_deletePublicacion(?) }"; //id_publicacion - setea 'eliminado=1'
     private static final String SQL_UPDATE_PUBLICATION_ENABLE_DISABLE = "{ call proc_updatePublicacion_EnableDisable(?, ?)}"; //id_publicacion, habilitado(boolean) - setea 'habilitado'
-    
     
     private static final ConnectDB conn = ConnectDB.getInstance(); //use singleton
     private PreparedStatement ps;
@@ -23,12 +23,12 @@ public class PublicationDAO {
     private PublicationDTO publication;
     private List<PublicationDTO> list;
     
-    public List<PublicationDTO> getPublications(short id_muro) {
+    public List<PublicationDTO> getPublications(short id_wall) {
         try {
             publication = null;
             list = null;
             ps = conn.getConnection().prepareStatement(SQL_SELECT_PUBLICATIONS);
-            ps.setObject(1, id_muro);
+            ps.setShort(1, id_wall);
             
             rs = ps.executeQuery();
             while(rs.next()){
@@ -50,11 +50,39 @@ public class PublicationDAO {
         return list;
     }
     
-    public boolean insertPublication(String texto, short id_muro, String id_user) {
+    public List<PublicationDTO> getPublicationsBeforeDate(short id_wall, String date) {
+        try {
+            publication = null;
+            list = null;
+            ps = conn.getConnection().prepareStatement(SQL_SELECT_PUBLICATIONS_BEFORE_DATE);
+            ps.setShort(1, id_wall);
+            ps.setString(2, date);
+            
+            rs = ps.executeQuery();
+            while(rs.next()){
+                if(list == null){
+                    list = new ArrayList();
+                }
+                publication = new PublicationDTO(rs.getInt("id_publicacion"), rs.getString("texto"), rs.getShort("likes"), "Me gusta", rs.getString("id_usuario"), rs.getString("nombre"), rs.getString("fecha_publicacion"));
+                list.add(publication);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CareerDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                conn.closeConnection();
+            } catch (SQLException ex) {
+                Logger.getLogger(CareerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return list;
+    }
+    
+    public boolean insertPublication(String texto, short id_wall, String id_user) {
         try {
             ps = conn.getConnection().prepareStatement(SQL_INSERT_PUBLICATION);
             ps.setString(1, texto);
-            ps.setShort(2, id_muro);
+            ps.setShort(2, id_wall);
             ps.setString(3, id_user);
             
             if(ps.executeUpdate() > 0){

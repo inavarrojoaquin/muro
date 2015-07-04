@@ -18,12 +18,12 @@ public class WallDAO{
     private ResultSet rs;
     private WallDTO wall;
     
-    public WallDTO getMuro(short id_career, short id_muro) {
+    public WallDTO getMuro(short id_career, short id_wall) {
         try {
             wall = null;
             ps = conn.getConnection().prepareStatement(SQL_SELECT_MURO);
             ps.setShort(1, id_career);
-            ps.setShort(2, id_muro);
+            ps.setShort(2, id_wall);
             
             rs = ps.executeQuery();
             while(rs.next()){
