@@ -1,11 +1,19 @@
 use muro
 go
 
-delete from [Like]
+delete from [dbo].[Like]
 go
 delete from Comentario
 go
+DBCC CHECKIDENT ('Comentario', RESEED,0)
+go
 delete from Compartir
+go
+DBCC CHECKIDENT ('Compartir', RESEED,0)
+go
+delete from Publicacion
+go
+DBCC CHECKIDENT ('Publicacion', RESEED,0)
 go
 delete from AccesoUsuario
 go
@@ -196,7 +204,7 @@ GO
 IF OBJECT_ID ('proc_getMateriaCarreraUsuario') IS NOT NULL
    DROP PROCEDURE proc_getMateriaCarreraUsuario
 GO
-/*Retorna las materias de un alumno en una carrera*/
+/*Retorna las materias y el muro asociado a cada materia de un alumno en una carrera*/
 CREATE PROCEDURE proc_getMateriaCarreraUsuario
 	-- Add the parameters for the stored procedure here
 	@id_usuario varchar(10),
@@ -208,42 +216,23 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	select distinct m.id_materia, m.nombre
-	from AccesoUsuario au 
-	join (select acm.id_carrera, acm.id_materia, acm.dni_alumno  as dni_persona
-		from AlumnosCarMateria acm
-		UNION
-		select cm.id_carrera, cm.id_materia, cm.dni_profesor
-		from CarreraMateria cm) t
-	on au.dni_persona = t.dni_persona
-	join Materia m on m.id_materia = t.id_materia
-	where au.dni_persona = @id_usuario
-	and t.id_carrera = @id_carrera
-END
-GO
-
-IF OBJECT_ID ('proc_getMuro') IS NOT NULL
-   DROP PROCEDURE proc_getMuro
-GO
-/*Retorna el muro correspondiente a una carrera-materia*/
-CREATE PROCEDURE proc_getMuro
-	-- Add the parameters for the stored procedure here
-	@id_carrera tinyint,
-	@id_materia tinyint
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT OFF;
-
-    -- Insert statements for procedure here
-	select m.id_muro, m.fecha_creacion
+	select mat.id_materia, mat.nombre, m.id_muro, m.habilitado, m.fecha_creacion
 	from Muro m
-	where m.id_carrera = @id_carrera
-		and m.id_materia = @id_materia
-		and m.habilitado = 1
+	join (select distinct t.id_carrera, m.id_materia, m.nombre
+		from AccesoUsuario au 
+		join (select acm.id_carrera, acm.id_materia, acm.dni_alumno  as dni_persona
+			from AlumnosCarMateria acm
+			UNION
+			select cm.id_carrera, cm.id_materia, cm.dni_profesor
+			from CarreraMateria cm) t
+		on au.dni_persona = t.dni_persona
+		join Materia m on m.id_materia = t.id_materia
+		where au.dni_persona = @id_usuario
+		and t.id_carrera = @id_carrera)mat
+	on m.id_carrera = mat.id_carrera
+	and m.id_materia = mat.id_materia
 END
-go
+GO
 
 IF OBJECT_ID ('proc_updateMuro_EnableDisable') IS NOT NULL
    DROP PROCEDURE proc_updateMuro_EnableDisable
@@ -286,7 +275,9 @@ BEGIN
 	from Publicacion p 
 	join AccesoUsuario au on p.id_usuario = au.id_usuario
 	join Persona pe on au.dni_persona = pe.dni_persona
+	join Muro m on m.id_muro = p.id_muro
 	where p.id_muro = @muro
+     and m.habilitado = 1
 	 and p.habilitado = 1
 	 and p.eliminado = 0
 END
@@ -311,8 +302,10 @@ BEGIN
 	from Publicacion p 
 	join AccesoUsuario au on p.id_usuario = au.id_usuario
 	join Persona pe on au.dni_persona = pe.dni_persona
+	join Muro m on m.id_muro = p.id_muro
 	where p.id_muro = @muro
-	and p.fecha_publicacion > @fecha
+	 and m.habilitado = 1
+	 and cast(p.fecha_publicacion as datetime) > cast(@fecha as datetime)
 	 and p.habilitado = 1
 	 and p.eliminado = 0
 END
@@ -560,6 +553,6 @@ BEGIN
     -- Insert statements for procedure here
 	update Comentario
 	set eliminado = 1
-	where id_publicacion = @id_comentario
+	where id_comentario = @id_comentario
 END
 GO

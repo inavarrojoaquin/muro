@@ -3,13 +3,15 @@ package model.dto;
 public class SubjectDTO {
     private short id_materia;
     private String nombre;
+    private WallDTO muro;
 
     public SubjectDTO() {
     }
 
-    public SubjectDTO(short id_materia, String nombre) {
+    public SubjectDTO(short id_materia, String nombre, WallDTO muro) {
         this.id_materia = id_materia;
         this.nombre = nombre;
+        this.muro = muro;
     }
 
     public short getId_materia() {
@@ -22,5 +24,8 @@ public class SubjectDTO {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+    public WallDTO getMuro() {
+        return muro;
     }
 }

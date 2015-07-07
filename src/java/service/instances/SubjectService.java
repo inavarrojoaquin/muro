@@ -14,4 +14,8 @@ public class SubjectService {
     public List<SubjectDTO> getSubjects(String id_user, short id_career) {
         return subjectDAO.selectAllSubjects(id_user, id_career);
     }
+    
+    public boolean enableDisabledMuro(short id_career, short id_subject, boolean enable){
+        return subjectDAO.enableDisableMuro(id_career, id_subject, enable);
+    }
 }

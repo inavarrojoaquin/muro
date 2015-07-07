@@ -44,7 +44,7 @@ public class LoginServlet extends HttpServlet {
         if (userDTO != null && updateOK == true) {
             session.setAttribute("id_user", userDTO.getIdUsuario());
             session.setAttribute("userName", userDTO.getNombre()+" "+userDTO.getApellido());
-            session.setAttribute("id_rol", userDTO.getIdRol());
+            session.setAttribute("id_role", userDTO.getIdRol());
 //            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/muro.jsp");
 //            dispatcher.forward(request,response);
             response.sendRedirect("muro.jsp");

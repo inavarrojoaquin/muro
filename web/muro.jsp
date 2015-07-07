@@ -20,6 +20,7 @@
             <h1>MURO</h1>
             <input type="hidden" name="id_user" value="${id_user}" />
             <input type="hidden" name="userName" value="${userName}" />
+            <input type="hidden" name="id_role" value="${id_role}" />
             <a href="logout.do">Logout</a><br/>
         </header>
         <nav>

@@ -19,7 +19,6 @@ import service.instances.CommentService;
 import service.instances.LoginService;
 import service.instances.PublicationService;
 import service.instances.SubjectService;
-import service.instances.WallService;
 
 /**
  *

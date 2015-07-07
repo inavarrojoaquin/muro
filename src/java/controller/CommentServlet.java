@@ -55,6 +55,11 @@ public class CommentServlet extends HttpServlet {
         String text = request.getParameter("text");
         String id_user = request.getParameter("id_user");
         String id_publication = request.getParameter("id_publication");
+        String _method = request.getParameter("method");
+        
+        if(_method != null){
+            doDelete(request, response);
+        }
         
         if(text != null && id_user != null && id_publication != null){
             boolean insertOk = commentService.insertComment(text, id_user, Integer.parseInt(id_publication));
@@ -62,6 +67,23 @@ public class CommentServlet extends HttpServlet {
                 response.getWriter().write("{\"mensaje\":\"Comentario insertado correctamente\"}");
             }else {
                 response.getWriter().write("{\"error\":\"Error de insercion del comentario\"}");
+            }
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        
+        String id_comment = request.getParameter("id_comment");
+        
+        if(id_comment != null){
+            boolean deleteOk = commentService.deleteComment(Integer.parseInt(id_comment));
+            if(deleteOk){
+                response.getWriter().write("{\"mensaje\":\"Comentario eliminado correctamente\"}");
+            }else{
+                response.getWriter().write("{\"error\":\"Error al eliminar comentario\"}");
             }
         }
     }

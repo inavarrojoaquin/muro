@@ -52,6 +52,24 @@ public class SubjectServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        
+        String id_career = request.getParameter("id_career");
+        String id_subject = request.getParameter("id_subject");
+        String enable = request.getParameter("enable");
+        
+        String representacionJSON; 
+        
+        if(id_career != null && id_subject != null && enable != null){
+            boolean enableOk = subjectService.enableDisabledMuro(Short.parseShort(id_career), Short.parseShort(id_subject), Boolean.parseBoolean(enable));
+            if (enableOk) {
+                representacionJSON = " {\"mensaje\":\"Muro habiltado-deshabilitado correctamente\"} ";
+            }else {
+                representacionJSON = " {\"error\":\"No se encontro el muro\" } ";
+            }
+            response.getWriter().write(representacionJSON);
+        }
     }
 
     @Override
