@@ -1,0 +1,62 @@
+body {
+    background-color: #e9eaed;
+}
+
+/** -- HEADER -- */
+.navbar {
+    margin-bottom: 0px;
+}
+
+/** -- MAIN -- */
+.main {
+    margin-top: 60px;
+    margin-bottom: 20px;
+}
+
+li {
+    list-style: none;
+}
+
+.publication {
+    background-color: white;
+    padding-left: 10px;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-right: 10px;
+}
+
+/** -- ASIDE -- */
+.input-group a {
+    text-align: center;
+}
+
+.input-group label {
+    font-weight: normal;
+}
+
+/** -- COMMENTS -- */
+.comments-panel {
+    margin-bottom: 10px;
+}
+
+.comment-info {
+    font-size: 12px;
+}
+
+.comment {
+    border-bottom: 1px groove #999;
+    margin-bottom: 5px;
+}
+
+.well {
+    margin-bottom: 0px;
+    padding: 10px;
+}
+
+.comment-info p {
+    margin-bottom: 5px;
+}
+
+.date-comment {
+    font-size: 10px;
+}

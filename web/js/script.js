@@ -7,16 +7,22 @@ $(document).ready(function(){
     var id_careerSelected;
     var id_subjectSelected;
     var id_wall = -1;
-    var endDatePublication = "-1";
+    var endDatePublication = "";
 
+    /**Load facebook API*/
+    $.getScript('templates/facebookAPI.js', function(){});
+    /**Load twitter API*/
+    $.getScript('templates/twitterAPI.js', function(){});
+    
 /**
  * (1,'DIRECTOR'),
  * (2,'PROFESOR'),
  * (3,'ALUMNO')
  * */
 
+    /**Return the last 5 publication*/
     function getLast5Publications() {
-        if(id_wall !== -1 && endDatePublication !== "-1"){
+        if(id_wall !== -1){
             var promiseTopPublications = callAJAX('publication.do', {id_wall:id_wall, endDatePublication:endDatePublication});
             promiseTopPublications
                     .then(function(vector){
@@ -55,15 +61,16 @@ $(document).ready(function(){
     /**Clickes in some subject. Obtain id_muro related with subject selected and obtain muro's publications*/
    $("#materias").on("click", "li span", function(){
        var subjectText = $(this).text();
+       var enableMuro = $(this).siblings('input:checkbox').is(':checked');
+       var onlyIsProfesor = (id_role == 2) ? enableMuro : true;
        id_wall = $(this).siblings("input:hidden[name=id_wall]").val();
-       if(selectionSubject !== subjectText){
+       if(selectionSubject !== subjectText & onlyIsProfesor == true){
            cleanError();
            cleanPublications();
            selectionSubject = subjectText;
-           //id_subjectSelected = $("input[name='"+selectionSubject+"']").val();
            publicationProcess(id_wall, id_user);
        }else {
-            setError("Selecciono la misma materia");
+            setError("Selecciono la misma materia o el muro esta deshabilitado");
        } 
    });
    
@@ -108,7 +115,7 @@ $(document).ready(function(){
         }
     });
     
-   /***/
+   /**When the user clicks in insert button for insert publication*/
    $("#insertContent").on('click', function(){
        var maxLength = 150;
        var content = $.trim($("#contentPublication").val());
@@ -118,6 +125,7 @@ $(document).ready(function(){
             insertPublication(content, id_wall, id_user);
        }
    });
+   
     /**Insert publication in the actual muro*/
     function insertPublication(content,id_wall, id_user){
         var promiseInsert = callAJAX('publication.do', {text:content, id_wall: id_wall, id_user: id_user}, 'POST');
@@ -136,14 +144,14 @@ $(document).ready(function(){
     /**when the user clicked in 'Ver comentarios'
      * The first time call ajax. Then show and hide comments.
      * */
-    $("#publications").on('click','article .publicationComments', function(){
+    $("#publications").on('click','#viewComments', function(){
+        var element = $(this);
         var action = $(this).text();
         var comments = $(this).siblings('.comments').children();
         
         if(action == "Ver comentarios" & comments.length == 0 ){
-            $(this).text("Ocultar comentarios");
             var id_publication = $(this).siblings("input:hidden[name=publication]").val();
-            commentsListByPublication(id_publication);
+            commentsListByPublication(id_publication, element);
         }else if(action == "Ver comentarios" & comments.length > 0){
             $(this).text("Ocultar comentarios");
             $(this).siblings("div.comments").show();
@@ -151,16 +159,15 @@ $(document).ready(function(){
             $(this).text("Ver comentarios");
             $(this).siblings("div.comments").hide();
         }
-            
     });
     
     /**when the user want insert a comment in one particular publication*/
-    $("#publications").on('click','input[name=submitComment]', function(){
-        var id_publication = $(this).siblings('input:hidden[name=publication]').val();
-        var input = $(this).siblings('input:text[name=textComment]');
+    $("#publications").on('click','#div-comment input[name=submitComment]', function(){
+        var id_publication = $(this).parents('div').siblings('input:hidden[name=publication]').val();
+        var input = $(this).parent().siblings('input:text[name=textComment]');
         var inputText = $.trim(input.val());
         var maxLength = 150;
-        var span = $(this).siblings('span');
+        var viewComments = $(this).parents('div').siblings('#viewComments');
        if(inputText.length === 0 || inputText.length > maxLength){
            setError("Contenido vacio o mayor a 150 caracteres");
        }else {
@@ -169,7 +176,7 @@ $(document).ready(function(){
                     .then(function(vector){
                             if(!vector.error){
                                 input.val('');
-                                span.click(); //simulate click on span. preview defined
+                                viewComments.click(); //simulate click on viewComments. preview defined
                             }else {
                                 setError(vector.error);
                             }
@@ -199,6 +206,21 @@ $(document).ready(function(){
                 });
    });
    
+   /**When the user clicks in facebook or twitter icon in one publicacion to share*/
+    $("#publications").on('click','[data-share]', function(){
+        var dataName = $(this).data('share');
+        var id_publication = $(this).siblings('input:hidden[name=publication]').val();
+        var publicationText = $(this).siblings('input:hidden[name=publicationText]').val();
+                
+        if(dataName == 'facebook'){
+            //function in FacebookAPI
+            shareFacebookPublication(id_publication, id_user, publicationText);
+        }else{
+            //function in TwitterAPI
+            shareTwitterPublication(id_publication, id_user, publicationText);
+        }
+    });
+   
     /**The process get id_muro then get and show the muro's publications*/
     function publicationProcess(id_wall, id_user){
         var promisePublication = callAJAX('publication.do', {id_wall:id_wall, id_user:id_user}); //AJAX return a promise
@@ -210,9 +232,12 @@ $(document).ready(function(){
                         hideOptionsMenu();
                     }else {
                         setError(vector.error);
+                        showInsertPublication();
+                        
                     }
                 });
     }
+    
     /**Load publications in muro*/
     function loadPublications(vector){
         for(var i = 0; i < vector.length; i++) {
@@ -229,31 +254,42 @@ $(document).ready(function(){
             var isProfesor = (id_role == 2) ? " <div class='optionsMenu'><span class='publicationOptions'>Opciones</span><ul class='sub-menu'><li>Eliminar</li></ul></div>" : "";
 
             $("#publications").prepend("<article id='"+id_publication+"' class='publication'></article>");
-            $("#publications article:first").append("<input type='hidden' name='publication' value='"+id_publication+"'></input>");
+            $("#publications article:first").append("<input type='hidden' name='publication' value='"+id_publication+"'>");
+            $("#publications article:first").append("<input type='hidden' name='publicationText' value='"+publicationText+"'>");
             $("#publications article:first").append("<label>Publicado por: "+publicationUserName+"</label>");
             $("#publications article:first").append("<label> Fecha publicacion: "+publicationDate+"</label>");
             $("#publications article:first").append(isProfesor);
-            $("#publications article:first").append(content);
-            $("#publications article:first").append("<input class='likePublication' type='button' name='like' value='"+userLike+"' "+isLike+"></input>");        
+            $("#publications article:first").append("<div class='thumbnail'>"+content+"</div>");
+            $("#publications article:first").append("<input class='likePublication btn btn-primary' type='button' name='like' value='"+userLike+"' "+isLike+">");
+            $("#publications article:first").append("<a data-share='facebook'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/31Gnichxt/facebook.png' title='Facebook'/></a>");
+            $("#publications article:first").append("<a data-share='twitter' href='http://twitter.com/intent/tweet?text="+publicationText+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'/></a> ");
             $("#publications article:first").append("<label name='labelLike'> Likes: <span>"+publicationLikes+"</span></label>");
-            $("#publications article:first").append("<input type='text' name='textComment' placeholder='Ingrese comentario'></input>");
-            $("#publications article:first").append("<input type='button' name='submitComment' value='Comentar'></input>");
-            $("#publications article:first").append("</br><span class='publicationComments'>Ver comentarios</span>");
+            $("#publications article:first").append("<div id='div-comment' class='form-group'><div class='col-md-6'><div class='input-group'>\n\
+                                                    <input type='text' class='form-control' name='textComment' placeholder='Ingrese comentario'/>\n\
+                                                    <span class='input-group-btn'><input type='button' class='btn btn-primary' name='submitComment' value='Comentar'/>\n\
+                                                    </span></div></div></div>");
+            $("#publications article:first").append("<p id='viewComments' class='publicationComments'>Ver comentarios</p>");
             $("#publications article:first").append("<div class='comments'></div>");
         }
     }
     
-    function commentsListByPublication(id_publication){
+    /**Return comments list by publication */
+    function commentsListByPublication(id_publication, element){
         var promiseCommentsByPublication = callAJAX('comment.do', {id_publication:id_publication});
             promiseCommentsByPublication
                         .then(function(vector){
                             if(!vector.error){
+                                $(element).text("Ocultar comentarios");
                                 loadCommentsInPublication(vector);
                                 hideOptionsMenu();
+                            }
+                            else {
+                                setError(vector.error);
                             }
                         });
     }
     
+    /**Load comments in the selected publication*/
     function loadCommentsInPublication(vector){
         for(var i = 0; i < vector.length; i++){
             var id_comment = vector[i].id_comentario;
@@ -285,6 +321,7 @@ $(document).ready(function(){
                 });
     };
     
+    /**Load subject list*/
     function loadSubjectList(vector){
         if($("#materias ul").length === 0){
             $("#materias").append("<ul></ul>");
@@ -298,11 +335,11 @@ $(document).ready(function(){
             var enable = wall.habilitado;
             var checked = (enable) ? "checked" : "";
             
-            var isProfesor = (id_role == 2) ? " <input type='checkbox' name='enableMuro' "+checked+" /> Habilitado" : "";
+            var isProfesor = (id_role == 2) ? " <input type='checkbox' name='enableMuro' "+checked+" > Habilitado" : "";
             $("#materias ul").append("<li></li>");
             $("#materias li:last").append("<input type='hidden' name='"+name+"' value='"+id_subject+"' /><span>" +name+ "</span>");
-            $("#materias li:last").append(isProfesor);
             $("#materias li:last").append("<input type='hidden' name='id_wall' value='"+id_wall+"' />");
+            $("#materias li:last").append(isProfesor);
             
         }
     }
@@ -320,7 +357,7 @@ function generateCareerList(){
                     for(var i = 0; i < vector.length; i++) {
                         var id_career = vector[i].id_carrera;
                         var name = vector[i].nombre;
-                        $("#carreras ul").append("<li><input type='hidden' name='"+name+"' value='"+id_career+"' />" +name+ "</li>");
+                        $("#carreras ul").append("<li><input type='hidden' name='"+name+"' value='"+id_career+"' >" +name+ "</li>");
                 }
                 }else {
                     setError(vector.error);
@@ -328,6 +365,7 @@ function generateCareerList(){
     });
 }
 
+/**Delete the selected publication*/
 function deletePublication(id_publication){
     var promiseDeletePublication = callAJAX('publication.do', {id_publication:id_publication, method:'delete'}, 'POST');
     promiseDeletePublication
@@ -340,7 +378,8 @@ function deletePublication(id_publication){
                 }
             });
 }
-    
+
+/**Delete the selected comment in one publication*/
 function deleteComment(id_publication, id_comment){
     var promiseDeleteComment = callAJAX('comment.do', {id_comment:id_comment, method:'delete'}, 'POST');
     promiseDeleteComment
@@ -365,32 +404,43 @@ function callAJAX(url, parameters, type){
         });     
 }
 
+/**Function that detect content in each publication*/
 function detectContent(text) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
     var imageRegex = /\.(jpeg|jpg|gif|png)$/;
     var youtubeRegex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     var vimeoRegex = /vimeo\.com\/([0-9]{1,10})/;
+    var oneLink = false;
     
     return text.replace(urlRegex, function(url) {
-        if(url.match(imageRegex)){
-            return "<p><img src='"+url+"' alt='Imagen X' height='42' width='42'></p>";
-        }else if(url.match(vimeoRegex)){
-            var match = url.match(vimeoRegex);
-            if(match){
-                id_vimeo = match[1];
-                return "<iframe src='https://player.vimeo.com/video/"+id_vimeo+"' width='250' height='250' frameborder='0'></iframe>\n\
-                        <p><a href='"+match+"' target='_blank'>Ver video en Vimeo</a></p>";
-            }
-        }else if(url.match(youtubeRegex)){
-            var match = url.match(youtubeRegex);
-            if(match){
-                id_youtube = match[2];
-                return "<iframe src='https://www.youtube.com/embed/"+id_youtube+"' width='250' height='250' frameborder='0'></iframe>\n\
-                        <p><a href='"+match+"' target='_blank'>Ver video en Youtube</a></p>";
-            }
-        }else {
+        if(!oneLink){
+            if(url.match(imageRegex)){
+                oneLink = true;
+                return "<img src='"+url+"' alt='Imagen X' height='42' width='42' class='img-responsive img-thumbnail'>";
+            }else if(url.match(vimeoRegex)){
+                var match = url.match(vimeoRegex);
+                if(match){
+                    oneLink = true;
+                    id_vimeo = match[1];
+                    return "<iframe src='https://player.vimeo.com/video/"+id_vimeo+"' width='250' height='250' frameborder='0'></iframe>\n\
+                            <p><a href='"+match+"' target='_blank'>Ver video en Vimeo</a></p>";
+                }
+            }else if(url.match(youtubeRegex)){
+                var match = url.match(youtubeRegex);
+                if(match){
+                    oneLink = true;
+                    id_youtube = match[2];
+                    return "<iframe src='https://www.youtube.com/embed/"+id_youtube+"' width='250' height='250' frameborder='0'></iframe>\n\
+                            <p><a href='"+match+"' target='_blank'>Ver video en Youtube</a></p>";
+                }
+            }else {
+                oneLink = true;
                 return "<p><a href='"+url+"' target='_blank'>Link a: '"+url+"'</a></p>";
-        } 
+            }
+        }else{
+            return "<p><a href='"+url+"' target='_blank'>Link a: '"+url+"'</a></p>";
+        }
+         
     });
 }
 

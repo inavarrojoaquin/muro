@@ -108,27 +108,9 @@ where cm.id_carrera = 1
  and p.id_rol = 3
 go
 
-/** Testing
-insert into AlumnosCarMateria(id_carrera,id_materia,dni_alumno,id_rol)
-values (2,3,'555',3)
-go
-*/
-
 insert into AccesoUsuario(id_usuario,password,dni_persona,id_rol)
 select pr.dni_persona as id_usuario,pr.dni_persona as password,pr.dni_persona,pr.id_rol
 from PersonaRol pr 
-go
-
-/**Implementados para prueba*/
-insert into Publicacion(texto,id_muro,id_usuario)
-values	('Comentario de prueba 1', 0, '555'),
-		('Comentario de prueba 2', 0, '555'),
-		('Comentario de prueba 3', 1, '555')
-go
-
-/**Implementados para prueba*/
-insert into [dbo].[Like](id_usuario, id_publicacion)
-values	('555', 4)
 go
 
 /*
@@ -160,7 +142,7 @@ GO
 CREATE PROCEDURE proc_updateAccesoUsuario_fecha_acceso
 	-- Add the parameters for the stored procedure here
 	@usuario varchar(10),
-	@fecha	varchar(20)
+	@fecha	varchar(25)
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -290,7 +272,7 @@ GO
 CREATE PROCEDURE proc_getPublicacionesMuroAfterDate
 	-- Add the parameters for the stored procedure here
 	@muro tinyint,
-	@fecha varchar(20)
+	@fecha varchar(25)
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -554,5 +536,27 @@ BEGIN
 	update Comentario
 	set eliminado = 1
 	where id_comentario = @id_comentario
+END
+GO
+
+IF OBJECT_ID ('proc_insertSharePublication') IS NOT NULL
+   DROP PROCEDURE proc_insertSharePublication
+GO
+/*Inserta datos de la publicacion compartida en facebook o twitter*/
+CREATE PROCEDURE proc_insertSharePublication
+	-- Add the parameters for the stored procedure here
+	@id_publicacion int,
+	@id_usuario_comparte varchar(10),
+	@texto varchar(150),
+	@destino char(1)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+    -- Insert statements for procedure here
+	insert into Compartir(id_publicacion, id_usuario_comparte, texto, destino)
+	values	(@id_publicacion, @id_usuario_comparte, @texto, @destino)
 END
 GO

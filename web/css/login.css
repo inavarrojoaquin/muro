@@ -1,21 +1,16 @@
-body{
-    background-color: darkcyan !important;
+body {
+    background-color: darkcyan;
 }
-header {
-    height: 50px;
+
+.login-box {
+    background-color: lightgray;
+    margin-top: 50px;
 }
+
 footer {
-    text-align: center;
+    color: #fff;
 }
-footer a {
-    color: white;
-}
-legend {
-    text-align: center;
-}
-.jumbotron {
-    background-color: lightgray !important;
-}
+
 /**Delete spinner to Crhome*/
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {

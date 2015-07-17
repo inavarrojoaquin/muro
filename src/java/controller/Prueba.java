@@ -14,7 +14,6 @@ import model.dto.UserDTO;
 import model.dto.WallDTO;
 import service.instances.CareerService;
 import service.ILoginService;
-import service.AbstractMuroService;
 import service.instances.CommentService;
 import service.instances.LoginService;
 import service.instances.PublicationService;
