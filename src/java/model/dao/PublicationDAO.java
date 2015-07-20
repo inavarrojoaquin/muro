@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.connection.ConnectDB;
+import model.dto.CommentDTO;
 import model.dto.PublicationDTO;
+import service.instances.CommentService;
 
 public class PublicationDAO {
     private static final String SQL_SELECT_PUBLICATIONS = "{ call proc_getPublicacionesMuro(?) }";//id_muro - retorna id_publicacion,texto,likes,fecha_publicacion
@@ -22,11 +24,14 @@ public class PublicationDAO {
     private ResultSet rs;
     private PublicationDTO publication;
     private List<PublicationDTO> list;
+    private final CommentService commentService = new CommentService();
+    private List<CommentDTO> commentList;
     
     public List<PublicationDTO> getPublications(short id_wall) {
         try {
             publication = null;
             list = null;
+            commentList = null;
             ps = conn.getConnection().prepareStatement(SQL_SELECT_PUBLICATIONS);
             ps.setShort(1, id_wall);
             
@@ -34,8 +39,10 @@ public class PublicationDAO {
             while(rs.next()){
                 if(list == null){
                     list = new ArrayList();
+                    commentList = new ArrayList();
                 }
-                publication = new PublicationDTO(rs.getInt("id_publicacion"), rs.getString("texto"), rs.getShort("likes"), "Me gusta", rs.getString("id_usuario"), rs.getString("nombre"), rs.getString("fecha_publicacion"));
+                commentList = commentService.getCommentsByPublication(rs.getInt("id_publicacion"));
+                publication = new PublicationDTO(rs.getInt("id_publicacion"), rs.getString("texto"), rs.getShort("likes"), "Me gusta", rs.getString("id_usuario"), rs.getString("nombre"), rs.getString("fecha_publicacion"), commentList);
                 list.add(publication);
             }
         } catch (SQLException ex) {
@@ -54,6 +61,7 @@ public class PublicationDAO {
         try {
             publication = null;
             list = null;
+            commentList = null;
             ps = conn.getConnection().prepareStatement(SQL_SELECT_PUBLICATIONS_BEFORE_DATE);
             ps.setShort(1, id_wall);
             ps.setString(2, date);
@@ -62,8 +70,10 @@ public class PublicationDAO {
             while(rs.next()){
                 if(list == null){
                     list = new ArrayList();
+                    commentList = new ArrayList();
                 }
-                publication = new PublicationDTO(rs.getInt("id_publicacion"), rs.getString("texto"), rs.getShort("likes"), "Me gusta", rs.getString("id_usuario"), rs.getString("nombre"), rs.getString("fecha_publicacion"));
+                commentList = commentService.getCommentsByPublication(rs.getInt("id_publicacion"));
+                publication = new PublicationDTO(rs.getInt("id_publicacion"), rs.getString("texto"), rs.getShort("likes"), "Me gusta", rs.getString("id_usuario"), rs.getString("nombre"), rs.getString("fecha_publicacion"), commentList);
                 list.add(publication);
             }
         } catch (SQLException ex) {

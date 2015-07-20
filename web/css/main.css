@@ -9,10 +9,13 @@ body {
 
 /** -- MAIN -- */
 .main {
-    margin-top: 60px;
+    margin-top: 10px;
     margin-bottom: 20px;
 }
 
+ul {
+    margin-bottom: 0px;
+}
 li {
     list-style: none;
 }
@@ -25,9 +28,15 @@ li {
     padding-right: 10px;
 }
 
+a[data-share="facebook"] {
+    cursor:pointer; //all but not in IE
+    cursor: hand; //only Internet Explorer
+}
+
 /** -- ASIDE -- */
 .input-group a {
     text-align: center;
+    height: auto;
 }
 
 .input-group label {
@@ -59,4 +68,11 @@ li {
 
 .date-comment {
     font-size: 10px;
+}
+
+#alert_placeholder {
+/*    position: absolute;
+    top: 100px;
+    left: 400px;*/
+    font-size: 12px;
 }

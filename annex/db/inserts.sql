@@ -108,6 +108,11 @@ where cm.id_carrera = 1
  and p.id_rol = 3
 go
 
+/**Only for testing*/
+insert into AlumnosCarMateria(id_carrera,id_materia,dni_alumno,id_rol)
+values (2, 3, '555', 3)
+go
+
 insert into AccesoUsuario(id_usuario,password,dni_persona,id_rol)
 select pr.dni_persona as id_usuario,pr.dni_persona as password,pr.dni_persona,pr.id_rol
 from PersonaRol pr 
@@ -495,6 +500,32 @@ BEGIN
 	where c.id_publicacion = @id_publicacion
 	and c.habilitado = 1
 	and c.eliminado = 0
+END
+GO
+
+IF OBJECT_ID ('proc_getCommentsPublicationAfterDate') IS NOT NULL
+   DROP PROCEDURE proc_getCommentsPublicationAfterDate
+GO
+/*Retorna los comentarios despues de la fecha*/
+CREATE PROCEDURE proc_getCommentsPublicationAfterDate
+	-- Add the parameters for the stored procedure here
+	@id_publicacion int,
+	@fecha varchar(25)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+	-- Insert statements for procedure here
+	select c.id_comentario, c.texto, c.id_publicacion, p.nombre, p.apellido, c.fecha_creacion
+	from Comentario c
+	join AccesoUsuario au on au.id_usuario = c.id_usuario
+	join Persona p on p.dni_persona = au.dni_persona
+	where c.id_publicacion = @id_publicacion
+	and c.habilitado = 1
+	and c.eliminado = 0
+	and cast(c.fecha_creacion as datetime) > cast(@fecha as datetime)
 END
 GO
 

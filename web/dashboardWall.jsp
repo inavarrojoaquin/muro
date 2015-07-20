@@ -1,6 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="es">
+<html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,9 +8,9 @@
         <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>   <%--Boostrap css--%>
         <link rel="stylesheet" href="css/main.css">
     </head>
-    <body id="top-page">
+    <body id="page-top">
         <header>
-            <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+            <nav class="navbar navbar-default navbar-static-top navbar-inverse">
                 <div class="container">
                     <div class="navbar-header">
                         <a href="#" class="navbar-brand">Muro <span class="small">ubp</span></a>
@@ -18,7 +18,7 @@
                     <%-- Inicia Menu --%>
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
-                            <li role="presentation"><a href="#top-page">Inicio</a></li>
+                            <li role="presentation"><a href="#page-top">Inicio</a></li>
                             <li role="presentation"><a href="#">Logout</a></li>
                         </ul>
                     </div>
@@ -38,7 +38,7 @@
                     </div>
                     <div class="list-group">
                         <a href="#" class="list-group-item list-group-item-heading active">Materias</a>
-                        <div class="">
+                        <div>
                             <div class="input-group">
                                <span class="input-group-addon">
                                    <label>
@@ -57,9 +57,19 @@
                             </div><!-- /input-group -->
                         </div>    
                     </div>
+                    
+                    <div id="alert_placeholder" tabindex="0"></div> <%-- tabindex='0' para poder dar foco a un div --%>
                 </aside>
                 
                 <section class="publications col-md-7">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Escriba una publicacion..." >
+                            <textarea class="form-control custom-control" rows="2" style="resize:none" placeholder="Aqui links(imagenes, video: Youtube, Vimeo)"></textarea>     
+                            <span class="input-group-addon btn btn-primary">Send</span>
+                        </div>
+                    </div>
+                    
                     <article class="publication clearfix">
                         <input type='hidden' name='publication'>
                         <input type='hidden' name='publicationText'>
@@ -98,8 +108,8 @@
                         <div class="">
                             <div class="form-group">
                                 <button class='likePublication btn btn-primary btn-sm' type='button' name='like' value='Me gusta'>Me gusta <span class="badge">5</span></button>
-                                <a data-share='facebook'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/31Gnichxt/facebook.png' title='Facebook'/></a>
-                                <a data-share='twitter' href='http://twitter.com/intent/tweet?text="+publicationText+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'/></a>
+                                <a data-share='facebook'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/31Gnichxt/facebook.png' title='Facebook' ></a>
+                                <a data-share='twitter' href='http://twitter.com/intent/tweet?text="+publicationText+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'></a>
                             </div>
                             <div class='form-group'>
                                 <div class='input-group col-md-8'>
@@ -148,33 +158,47 @@
                             </div>
                         </div>
                     </article>
-                </section>
+                  </section>
             </div>
         </section>
-               
-                    
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="alert alert-success" role="alert">
-                        <button class="close" data-dismiss="alert"><span>&times;</span></button>
-                        <strong>Esto es un mensaje</strong>
+                
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-1 pull-right">
+                        <ul class="list-inline text-right">
+                            <li><a href="#page-top">Inicio</a></li>
+                        </ul>    
                     </div>
                 </div>
-            </div>    
-        </div>
-            
-        
-        
+            </div>
+        </footer>
+                    
+
         <script src="js/jquery.2.1.4.js" type="text/javascript"></script>
         <script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script> <%--Boostrap js--%>
         <script src="js/script.js"  type="text/javascript"></script>
+        
         
         <script>
                 $(".publication").on('click', 'span > a', function(){
                     alert($(this).text());
                     return false; //al poner return false, el atributo href queda deshabilitado
                 });
+                
+                //setTimeout(showalert("Soy el mensaje", "alert-success"), 3000); 
+                function showalert(message, alert_type) {
+                    $('#alert_placeholder').append('<div class="alert '+ alert_type +' fade in alert-message" role="alert"><button class="close" data-dismiss="alert"><span>&times;</span></button><strong>'+ message +'</strong></div>');
+                    //$('#alert_placeholder').focus();
+                    setTimeout(function() { // this will automatically close the alert and remove this if the users doesnt close it in 5 secs
+                        $(".alert-message").alert('close');
+                    }, 3000);
+                }
+                /**Se ejecuta cuando la alerta se cierra*/
+                $('.alert-message').on('closed.bs.alert', function () {
+                              //showalert('De nuevo', 'alert-danger');
+                });
         </script>
+        
     </body>
 </html>

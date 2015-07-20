@@ -11,61 +11,60 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body id="page-top">
+        <%-- HEADER --%>
         <header>
-            <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
-                <div class="container-fluid">
-                    <div class="col-md-8 col-md-offset-2">
-                        <div class="navbar-header">
-                            <a href="#" class="navbar-brand">Muro <span class="small">ubp</span></a>
-                        </div>
-                        <%-- Inicia menu --%>
-                        <div class="collapse navbar-collapse">
-                            <ul class="nav navbar-nav navbar-right">
-                                <li><a href="#page-top" class="">Inicio</a></li>
-                                <li><a href="logout.do" class="">Logout</a></li>
-                            </ul>
-                        </div>
+            <nav class="navbar navbar-default navbar-static-top navbar-inverse">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a href="#" class="navbar-brand">Muro <span class="small">ubp</span></a>
+                    </div>
+                    <%-- Inicia Menu --%>
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li role="presentation"><a href="#page-top">Inicio</a></li>
+                            <li role="presentation"><a href="logout.do">Logout</a></li>
+                        </ul>
                     </div>
                 </div>
             </nav>
-            <input type="hidden" name="id_user" value="${id_user}" />
-            <input type="hidden" name="userName" value="${userName}" />
-            <input type="hidden" name="id_role" value="${id_role}" />
+            <input type="hidden" name="id_user" value="${id_user}" >
+            <input type="hidden" name="userName" value="${userName}" >
+            <input type="hidden" name="id_role" value="${id_role}" >
         </header>
-        
+        <%-- MAIN WINDOW --%>
         <section class="main container">
-            
-        </section>
-        
-        <footer></footer>
-        
-        <div class="container">
             <div class="row">
-                <nav class="col-md-3 color1">
-                    <div id="carreras"><span id="idCarrera">Carrera</span></div>
-                    <div id="materias"><span id="idMateria">Materia</span></div>
-                    <div class="success"></div>
-                    <div class="error"></div>
-                </nav>
-                <section class='col-md-9 color2'>
-                    <div id="insertPublication" style='display:none;'>
-                        <form class="form-horizontal">
-                            <div class="form-group">
-                                <div class="col-md-5 col-md-offset-2">
-                                    <textarea id="contentPublication" class="form-control" placeholder="Escribe una publicacion"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-2 col-md-offset-2">
-                                    <input id="insertContent" type="button" class="btn btn-primary" value="Publicar"/>
-                                </div>
-                            </div>
-                        </form>
+                <%-- ASIDE --%>
+                <aside class="col-md-3">
+                    <%-- CAREERS --%>
+                    <div class="list-group" id="careers">
+                        <a href="#" class="list-group-item list-group-item-heading active">Carreras</a>
+                        <div id="career-list"></div>
                     </div>
+                    <%-- SUBJECTS --%>
+                    <div class="list-group" id="subjects">
+                        <a href="#" class="list-group-item list-group-item-heading active">Materias</a>
+                        <div id="subject-list"></div>    
+                    </div>
+                    <%-- ERROR-SUCCESS ALERT --%>
+                    <div id="alert-error-success" tabindex="0"></div> <%-- tabindex='0' para poder dar foco a un div --%>
+                    
+                </aside>
+                <%-- MAIN WALL --%>
+                <section class="col-md-7">
+                    <%-- INSERT PUBLICATIONS --%>
+                    <div class="form-group" id="insert-form-publication" style="display: none">
+                        <div class="input-group">
+                            <input type="text" id="text-publication-to-insert" class="form-control" placeholder="Escriba una publicacion..." >
+                            <textarea id="link-publication-to-insert" class="form-control custom-control" rows="2" style="resize:none" placeholder="Aqui links(imagenes, video: Youtube, Vimeo)"></textarea>     
+                            <span id="send-publication" class="input-group-addon btn btn-primary">Publicar</span>
+                        </div>
+                    </div>
+                    <%-- PUBLICATIONS --%>
                     <div id="publications"></div>
                 </section>
             </div>
-        </div>
+        </section>
         
         <script src="js/jquery.2.1.4.js" type="text/javascript"></script>
         <script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script> <%--Boostrap js--%>

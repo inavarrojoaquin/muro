@@ -16,6 +16,11 @@ private CommentDAO commentDAO;
         return commentDAO.selectAllComments(id_publication);
     }
     
+    //getComments by publication
+    public List<CommentDTO> getLastCommentsByPublication(int id_publication, String lastDate) {
+        return commentDAO.selectLastComments(id_publication, lastDate);
+    }
+    
     //insert comment
     public boolean insertComment(String text,String id_user, int id_publication) {
         return commentDAO.insertComment(text, id_user, id_publication);

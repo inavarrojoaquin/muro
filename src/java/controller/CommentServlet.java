@@ -30,19 +30,31 @@ public class CommentServlet extends HttpServlet {
         response.setContentType("application/json");
         
         String id_publication = request.getParameter("id_publication");
+        String lastDateComment = request.getParameter("lastDateComment");
         
         Type listType = new TypeToken<List<CommentDTO>>(){}.getType();        
         Gson gson = new GsonBuilder().serializeNulls().create();
         String representacionJSON;
         
         if(id_publication != null){
-            List<CommentDTO> commentList = commentService.getCommentsByPublication(Integer.parseInt(id_publication));
-            if (commentList != null) {
-                representacionJSON = gson.toJson(commentList, listType);
+            if(lastDateComment == null){
+                List<CommentDTO> commentList = commentService.getCommentsByPublication(Integer.parseInt(id_publication));
+                if (commentList != null) {
+                    representacionJSON = gson.toJson(commentList, listType);
+                }else {
+                    representacionJSON = "{ \"error\":\"La publicacion seleccionada no tiene comentarios para mostrar\" }";
+                }
+                response.getWriter().write(representacionJSON);
             }else {
-                representacionJSON = "{ \"error\":\"La publicacion seleccionada no tiene comentarios para mostrar\" }";
+                List<CommentDTO> commentList = commentService.getLastCommentsByPublication(Integer.parseInt(id_publication), lastDateComment);
+                if (commentList != null) {
+                    representacionJSON = gson.toJson(commentList, listType);
+                }else {
+                    representacionJSON = "{ \"error\":\"La publicacion seleccionada no tiene comentarios para mostrar\" }";
+                }
+                response.getWriter().write(representacionJSON);
             }
-            response.getWriter().write(representacionJSON);
+            
         }
     }
 

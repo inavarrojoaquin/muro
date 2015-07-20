@@ -12,6 +12,8 @@ import model.dto.CommentDTO;
 
 public class CommentDAO {
     private static final String SQL_SELECT_COMMENTS_BY_PUBLICATION = "{ call proc_getAllCommentsByPublication(?) }"; //id_publicacion, return all comments
+    private static final String SQL_SELECT_LASTCOMMENTS_BY_PUBLICATION = "{ call proc_getCommentsPublicationAfterDate(?, ?) }"; //id_publicacion, ultimafecha, return all comments
+    
     private static final String SQL_INSERT_COMMENT = "{ call proc_insertCommentInPublication(?, ?, ?) }"; //texto,id_usuario,id_publicacion
     private static final String SQL_DELETE_COMMENT = "{ call proc_deleteComment(?) }"; //id_comentario, set 'eliminado=1'
             
@@ -27,6 +29,34 @@ public class CommentDAO {
             list = null;
             ps = conn.getConnection().prepareStatement(SQL_SELECT_COMMENTS_BY_PUBLICATION);
             ps.setInt(1, id_publication);
+            
+            rs = ps.executeQuery();
+            while(rs.next()){
+                if(list == null){
+                    list = new ArrayList();
+                }
+                comment = new CommentDTO(rs.getInt("id_comentario"), rs.getString("texto"), rs.getInt("id_publicacion"), rs.getString("nombre"), rs.getString("apellido"), rs.getString("fecha_creacion"));
+                list.add(comment);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                conn.closeConnection();
+            } catch (SQLException ex) {
+                Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return list;
+    }
+    
+    public List<CommentDTO> selectLastComments(int id_publication, String lastDate) {
+        try {
+            comment = null;
+            list = null;
+            ps = conn.getConnection().prepareStatement(SQL_SELECT_LASTCOMMENTS_BY_PUBLICATION);
+            ps.setInt(1, id_publication);
+            ps.setString(2, lastDate);
             
             rs = ps.executeQuery();
             while(rs.next()){

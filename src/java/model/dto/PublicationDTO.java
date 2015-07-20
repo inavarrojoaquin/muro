@@ -1,5 +1,7 @@
 package model.dto;
 
+import java.util.List;
+
 public class PublicationDTO {
     private int id_publicacion;
     private String texto;
@@ -11,10 +13,11 @@ public class PublicationDTO {
     private String fecha_publicacion;
     private boolean habilitado;
     private boolean eliminado;
+    private List<CommentDTO> commentList;
 
     public PublicationDTO() {}
     
-    public PublicationDTO(int id_publicacion, String texto, short likes, String userLike, String id_usuario, String nombreUsuario, String fecha_publicacion) {
+    public PublicationDTO(int id_publicacion, String texto, short likes, String userLike, String id_usuario, String nombreUsuario, String fecha_publicacion, List<CommentDTO> commentList) {
         this.id_publicacion = id_publicacion;
         this.texto = texto;
         this.likes = likes;
@@ -22,6 +25,7 @@ public class PublicationDTO {
         this.id_usuario = id_usuario;
         this.nombreUsuario = nombreUsuario;
         this.fecha_publicacion = fecha_publicacion;
+        this.commentList = commentList;
     }
     
     public String getNombreUsuario() {
@@ -78,4 +82,8 @@ public class PublicationDTO {
     public void setUserLike(String userLike) {
         this.userLike = userLike;
     }    
+    
+    public List<CommentDTO> getComments() {
+        return commentList;
+    }
 }
