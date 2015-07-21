@@ -62,11 +62,24 @@
                 </aside>
                 
                 <section class="publications col-md-7">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Escriba una publicacion..." >
-                            <textarea class="form-control custom-control" rows="2" style="resize:none" placeholder="Aqui links(imagenes, video: Youtube, Vimeo)"></textarea>     
-                            <span class="input-group-addon btn btn-primary">Send</span>
+                    <%-- INPUT TABS --%>
+                    <ul class="nav nav-tabs">
+                        <li role="presentation" class="active"><a href="#tab-inputText" data-toggle="tab">Texto</a></li>
+                        <li role="presentation"><a href="#tab-inputLink" data-toggle="tab">Link</a></li>                        
+                    </ul>
+                    
+                   <div class="tab-content form-group">
+                        <div id="tab-inputText" class="tab-pane active">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id='text-publication-to-insert' data-action='input-publication' placeholder="Escriba una publicacion..." >
+                                <span class="input-group-addon btn btn-primary" data-action='send-publication'>Send</span>
+                            </div>
+                        </div>
+                        <div id="tab-inputLink" class="tab-pane">
+                            <div class="input-group">
+                                <textarea id='link-publication-to-insert' data-action='input-publication' class="form-control custom-control" rows="2" style="resize:none" placeholder="Aqui links(imagenes, video: Youtube, Vimeo)"></textarea>     
+                                <span class="input-group-addon btn btn-primary" data-action='send-publication'>Send</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -177,28 +190,7 @@
 
         <script src="js/jquery.2.1.4.js" type="text/javascript"></script>
         <script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script> <%--Boostrap js--%>
-        <script src="js/script.js"  type="text/javascript"></script>
-        
-        
-        <script>
-                $(".publication").on('click', 'span > a', function(){
-                    alert($(this).text());
-                    return false; //al poner return false, el atributo href queda deshabilitado
-                });
-                
-                //setTimeout(showalert("Soy el mensaje", "alert-success"), 3000); 
-                function showalert(message, alert_type) {
-                    $('#alert_placeholder').append('<div class="alert '+ alert_type +' fade in alert-message" role="alert"><button class="close" data-dismiss="alert"><span>&times;</span></button><strong>'+ message +'</strong></div>');
-                    //$('#alert_placeholder').focus();
-                    setTimeout(function() { // this will automatically close the alert and remove this if the users doesnt close it in 5 secs
-                        $(".alert-message").alert('close');
-                    }, 3000);
-                }
-                /**Se ejecuta cuando la alerta se cierra*/
-                $('.alert-message').on('closed.bs.alert', function () {
-                              //showalert('De nuevo', 'alert-danger');
-                });
-        </script>
+        <%-- <script src="js/script.js"  type="text/javascript"></script> --%>
         
     </body>
 </html>

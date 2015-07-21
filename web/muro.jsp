@@ -18,7 +18,7 @@
                     <div class="navbar-header">
                         <a href="#" class="navbar-brand">Muro <span class="small">ubp</span></a>
                     </div>
-                    <%-- Inicia Menu --%>
+                    <%-- INIT MENU --%>
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
                             <li role="presentation"><a href="#page-top">Inicio</a></li>
@@ -53,11 +53,25 @@
                 <%-- MAIN WALL --%>
                 <section class="col-md-7">
                     <%-- INSERT PUBLICATIONS --%>
-                    <div class="form-group" id="insert-form-publication" style="display: none">
-                        <div class="input-group">
-                            <input type="text" id="text-publication-to-insert" class="form-control" placeholder="Escriba una publicacion..." >
-                            <textarea id="link-publication-to-insert" class="form-control custom-control" rows="2" style="resize:none" placeholder="Aqui links(imagenes, video: Youtube, Vimeo)"></textarea>     
-                            <span id="send-publication" class="input-group-addon btn btn-primary">Publicar</span>
+                    <div id="insert-form-publication" style="display: none">
+                        <ul class="nav nav-tabs">
+                            <li role="presentation" class="active"><a href="#tab-inputText" data-toggle="tab">Texto</a></li>
+                            <li role="presentation"><a href="#tab-inputLink" data-toggle="tab">Link</a></li>                        
+                        </ul>
+                    
+                        <div class="tab-content form-group">
+                            <div id="tab-inputText" class="tab-pane active">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id='text-publication-to-insert' data-action='input-publication' placeholder="Escriba una publicacion..." >
+                                    <span class="input-group-addon btn btn-primary" data-action='send-publication'>Publicar</span>
+                                </div>
+                            </div>
+                            <div id="tab-inputLink" class="tab-pane">
+                                <div class="input-group">
+                                    <textarea id='link-publication-to-insert' data-action='input-publication' class="form-control custom-control" rows="2" style="resize:none" placeholder="Aqui links(imagenes, video: Youtube, Vimeo)"></textarea>     
+                                    <span class="input-group-addon btn btn-primary" data-action='send-publication'>Publicar</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <%-- PUBLICATIONS --%>

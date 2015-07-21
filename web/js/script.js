@@ -74,46 +74,30 @@ $(document).ready(function(){
                 });
    });
    
-   /**When the user clicks in insert button for insert publication*/
-   $("#send-publication").on('click', function(){
-       var maxLength = 150;
-       var contentText = $.trim($("#text-publication-to-insert").val());
-       var contentLink = $.trim($("#link-publication-to-insert").val());
-       var fullContentLink = (contentLink !== "") ? "^"+contentLink :"";
-       var finalContent = contentText + fullContentLink;
-       if(finalContent.length === 0 || finalContent.length > maxLength){
-            showAlert("Contenido vacio o mayor a 150 caracteres", "alert-danger");
-       }else {
-            insertPublication(finalContent, id_wall, id_user);
-       }
-   });
-   
-    /**when the user want insert a comment in one particular publication
-     * return false beacause are links and I do not want to reload the page
-     * */
+   /**When the user press Enter in text or link publication to insert*/
+    $("[data-action='input-publication']").on('keypress', function(event) {
+        if(event.which == 13) {
+            sendPublicationToInsert();
+        }
+    });
+
+    /**When the user clicks in button send publication*/
+    $("[data-action='send-publication']").on('click', function(){
+            sendPublicationToInsert();
+    });
+
+    /**When the user press Enter in text comment to insert*/
+    $("#publications").on('keypress','.like-comment-panel input[name="textComment"]', function(event) {
+        if(event.which == 13) {
+           var element = $(this).siblings().find("[name='submitComment']");
+           sendCommentToInsert(element);
+        }
+    });
+    
+    /**When the user clicks in button send comment*/
     $("#publications").on('click','.like-comment-panel input[name="submitComment"]', function(){
-        var id_publication = $(this).parents('article').attr('data-id-publication');
-        var input = $(this).parent().siblings('input[name=textComment]');
-        var inputText = $.trim(input.val());
-        var maxLength = 150;
-        var countCommentsElement = $(this).parents('div').siblings('.comments-panel').find('[data-name="cant-comments"]');
-        var lastDateComment = $(this).parents('div').siblings('.comments-panel').find('li:first').find(".date-comment").text();
-       if(inputText.length === 0 || inputText.length > maxLength){
-            showAlert("Contenido vacio o mayor a 150 caracteres", "alert-danger");
-       }else {
-            var promiseComment = callAJAX('comment.do', {text:inputText, id_user:id_user, id_publication:id_publication}, 'POST');
-            promiseComment
-                    .then(function(vector){
-                            if(!vector.error){
-                                input.val('');
-                                console.log("comentario insertado...");
-                                commentsListByPublication(id_publication, lastDateComment, countCommentsElement);
-                            }else {
-                                showAlert(vector.error, "alert-danger");
-                            }
-                        });
-       }   
-       return false;
+        var element = $(this);
+        sendCommentToInsert(element);
     });
     
    /**When the user select one option in the publication's option menu
@@ -188,6 +172,45 @@ $(document).ready(function(){
                         showAlert(data.error, "alert-danger");
                     }
                 });
+    }
+    
+    /**Insert new publication in the wall*/
+    function sendPublicationToInsert(){
+        var maxLength = 150;
+        var contentText = $.trim($("#text-publication-to-insert").val());
+        var contentLink = $.trim($("#link-publication-to-insert").val());
+        var fullContentLink = (contentLink !== "") ? "^"+contentLink :"";
+        var finalContent = contentText + fullContentLink;
+        if(finalContent.length === 0 || finalContent.length > maxLength){
+             showAlert("Contenido vacio o mayor a 150 caracteres", "alert-danger");
+        }else {
+            insertPublication(finalContent, id_wall, id_user);
+        }
+    };
+    
+    /**Insert new comment in one particular publication*/
+    function sendCommentToInsert(element){
+        var id_publication = $(element).parents('article').attr('data-id-publication');
+        var input = $(element).parent().siblings('input[name=textComment]');
+        var inputText = $.trim(input.val());
+        var maxLength = 150;
+        var countCommentsElement = $(element).parents('div').siblings('.comments-panel').find('[data-name="cant-comments"]');
+        var lastDateComment = $(element).parents('div').siblings('.comments-panel').find('li:first').find(".date-comment").text();
+       if(inputText.length === 0 || inputText.length > maxLength){
+            showAlert("Contenido vacio o mayor a 150 caracteres", "alert-danger");
+       }else {
+            var promiseComment = callAJAX('comment.do', {text:inputText, id_user:id_user, id_publication:id_publication}, 'POST');
+            promiseComment
+                    .then(function(vector){
+                            if(!vector.error){
+                                input.val('');
+                                console.log("comentario insertado...");
+                                commentsListByPublication(id_publication, lastDateComment, countCommentsElement);
+                            }else {
+                                showAlert(vector.error, "alert-danger");
+                            }
+                        });
+       }
     }
     
     /**Return the last 5 publication*/
