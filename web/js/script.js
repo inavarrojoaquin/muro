@@ -39,7 +39,6 @@ $(document).ready(function(){
     /** Generate subjects list*/
     $("#career-list").on("click", "a", function(){
        var careerName = $(this).text();
-        
        if (selectionCareer !== careerName){
             hideInsertPublication();
             cleanPublications();
@@ -52,7 +51,7 @@ $(document).ready(function(){
                     }
             });
        }else {
-            showAlert("La carrera ya fue seleccionada", "alert-danger");
+            //showAlert("La carrera ya fue seleccionada", "alert-danger");
        }
     });
     
@@ -68,7 +67,7 @@ $(document).ready(function(){
            cleanPublications();
            publicationProcess(id_wall, id_user);
        }else {
-            showAlert("Selecciono la misma materia o el muro esta deshabilitado", "alert-danger");
+            //showAlert("Selecciono la misma materia o el muro esta deshabilitado", "alert-danger");
        } 
    });
    
@@ -80,7 +79,7 @@ $(document).ready(function(){
        promiseModifyMuro
                .then(function(data){
                     if(!data.error){
-                        showAlert(data.mensaje, "alert-success");
+                        //showAlert(data.mensaje, "alert-success");
                         selectionSubject = "";
                         hideInsertPublication();
                         cleanPublications();
@@ -200,9 +199,8 @@ $(document).ready(function(){
                     if(!vector.error){
                         loadPublications(vector);                        
                     }else {
-                        showAlert(vector.error, "alert-danger");
+                        //showAlert(vector.error, "alert-danger");
                         showInsertPublication();
-                        
                     }
                 });
     }
@@ -230,11 +228,10 @@ $(document).ready(function(){
             var likeName = vector[i].userLike;
             var publicationIdUser = vector[i].id_usuario;
             var publicationUserName = vector[i].nombreUsuario;
-            console.log(publicationUserName);
             var publicationDate = vector[i].fecha_publicacion;
             var isLike = (likeName == "Esto te gusta") ? "disabled": "";
             var isStudent = (id_role == 3 || id_role == 1)? "hide" : "";
-            endDatePublication = publicationDate; //revisar, posible eliminacion
+            endDatePublication = publicationDate;
             
             var accessDate = Date.parse(lastAccessDate); 
             var pubDate = Date.parse(publicationDate); 
@@ -322,17 +319,18 @@ $(document).ready(function(){
             var id_wall = wallName.id_muro;
             var enable = wallName.habilitado;
             var checked = (enable) ? "checked" : "";
-
+            
             var hideCheckbox = (id_role == 3 || id_role == 1) ? "hide" : "";
             var tableNone = (id_role == 3 || id_role == 1) ? "style='display: inline'" : "";
-
+            var hideInput = ((id_role == 3 || id_role == 1) && enable == false) ? "hide" : "";
+            
             $("#subject-list").append("<div class='input-group' "+tableNone+">\n\
                                         <span class='input-group-addon "+hideCheckbox+"'>\n\
                                             <label>\n\
                                                 <input type='checkbox' data-name='wall_enable' "+checked+" > Habilitado\n\
                                             </label>\n\
                                         </span>\n\
-                                        <a href='#' class='list-group-item form-control' data-id-subject='"+id_subject+"' data-id-wall='"+id_wall+"'>"+subjectName+"</a></div>");
+                                        <a href='#' class='list-group-item form-control "+hideInput+"' data-id-subject='"+id_subject+"' data-id-wall='"+id_wall+"'>"+subjectName+"</a></div>");
         }
     }
 
@@ -368,7 +366,6 @@ $(document).ready(function(){
                     .then(function(vector){
                             if(!vector.error){
                                 input.val('');
-                                console.log("comentario insertado...");
                                 rankPublication(id_publication);
                                 commentsListByPublication(id_publication, lastDateComment, countCommentsElement);
                             }else {
@@ -525,7 +522,7 @@ function deletePublication(id_publication){
     promiseDeletePublication
             .then(function(data){
                 if(!data.error){
-                    showAlert(data.mensaje, "alert-success");
+                    //showAlert(data.mensaje, "alert-success");
                     deleteDivPublication(id_publication);
                 }else {
                     showAlert(data.error, "alert-danger");
@@ -539,7 +536,7 @@ function deleteComment(id_publication, id_comment){
     promiseDeleteComment
             .then(function(data){
                 if(!data.error){
-                    showAlert(data.mensaje, "alert-success");
+                    //showAlert(data.mensaje, "alert-success");
                     deleteDivComment(id_publication, id_comment);
                 }else {
                     showAlert(data.error, "alert-danger");
@@ -561,7 +558,6 @@ function callAJAX(url, parameters, type){
 //Show alert for error or success
 function showAlert(message, alert_type) {
     $('#alert-error-success').append('<div class="alert '+ alert_type +' fade in alert-message" role="alert"><button class="close" data-dismiss="alert"><span>&times;</span></button><strong>'+ message +'</strong></div>');
-    //$('#alert-error-success').focus();
     setTimeout(function() { // this will automatically close the alert and remove this if the users doesnt close it in 5 secs
         $(".alert-message").alert('close');
     }, 3000);
@@ -586,6 +582,13 @@ function cleanPublications(){
 function cleanContentToInsert(){
     $("#text-publication-to-insert").val("");
     $("#link-publication-to-insert").val("");
+}
+
+function update(){
+    location.reload();
+}
+function clearSessionStorage(){
+    sessionStorage.clear();
 }
 
 function changePublicationColor(id_publication){

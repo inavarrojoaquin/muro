@@ -35,7 +35,8 @@
                                 </button>
                                 <ul class="dropdown-menu" id="publication_menu"></ul>
                             </li>
-                            <li role="presentation"><a href="logout.do">Logout</a></li>
+                            <li role="presentation"><a href="#" onclick="update();">Update</a></li>
+                            <li role="presentation"><a href="logout.do" onclick="clearSessionStorage();">Logout</a></li>
                         </ul>
                     </div>
                 </div>
