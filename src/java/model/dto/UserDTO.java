@@ -19,11 +19,12 @@ public class UserDTO {
         this.nombre = nombre;
     }
     
-    public UserDTO(String id_usuario, String nombre, String apellido, Short id_rol) {
+    public UserDTO(String id_usuario, String nombre, String apellido, Short id_rol, String fecha_acceso) {
         this.id_usuario = id_usuario;
         this.nombre = nombre;
         this.apellido = apellido;
         this.id_rol = id_rol;
+        this.fecha_acceso = fecha_acceso;
     }
 
     public String getIdUsuario() {

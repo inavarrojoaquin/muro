@@ -31,7 +31,7 @@ public class UserDAO {
             
             rs = ps.executeQuery();
             while(rs.next()){
-                user = new UserDTO(rs.getString("id_usuario"), rs.getString("nombre"), rs.getString("apellido"), rs.getShort("id_rol"));
+                user = new UserDTO(rs.getString("id_usuario"), rs.getString("nombre"), rs.getString("apellido"), rs.getShort("id_rol"), rs.getString("fecha_acceso"));
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -46,7 +46,7 @@ public class UserDAO {
     }
     
     public boolean updateDate(String id_user) {
-        SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String time = format.format(date);
         

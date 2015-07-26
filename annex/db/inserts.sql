@@ -113,8 +113,8 @@ insert into AlumnosCarMateria(id_carrera,id_materia,dni_alumno,id_rol)
 values (2, 3, '555', 3)
 go
 
-insert into AccesoUsuario(id_usuario,password,dni_persona,id_rol)
-select pr.dni_persona as id_usuario,pr.dni_persona as password,pr.dni_persona,pr.id_rol
+insert into AccesoUsuario(id_usuario,password,dni_persona,id_rol, fecha_acceso)
+select pr.dni_persona as id_usuario,pr.dni_persona as password,pr.dni_persona,pr.id_rol, CONVERT(VARCHAR(10), GETDATE(), 103) + ' '  + convert(VARCHAR(8), GETDATE(), 14) as fecha_acceso
 from PersonaRol pr 
 go
 
@@ -258,7 +258,7 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	select p.id_publicacion, p.texto, p.likes, p.id_usuario, pe.nombre, p.fecha_publicacion
+	select p.id_publicacion, p.texto, p.likes, p.id_usuario, pe.nombre+' '+pe.apellido as nombre, p.fecha_publicacion
 	from Publicacion p 
 	join AccesoUsuario au on p.id_usuario = au.id_usuario
 	join Persona pe on au.dni_persona = pe.dni_persona
@@ -292,7 +292,7 @@ BEGIN
 	join Muro m on m.id_muro = p.id_muro
 	where p.id_muro = @muro
 	 and m.habilitado = 1
-	 and cast(p.fecha_publicacion as datetime) > cast(@fecha as datetime)
+	 and p.fecha_publicacion > @fecha
 	 and p.habilitado = 1
 	 and p.eliminado = 0
 END
@@ -314,8 +314,8 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	insert into Publicacion(texto,id_muro,id_usuario)
-	values	(@texto, @id_muro, @id_usuario)
+	insert into Publicacion(texto,id_muro,id_usuario, fecha_publicacion)
+	values	(@texto, @id_muro, @id_usuario, CONVERT(VARCHAR(10), GETDATE(), 103) + ' '  + convert(VARCHAR(8), GETDATE(), 14))
 END
 GO
 
@@ -525,7 +525,7 @@ BEGIN
 	where c.id_publicacion = @id_publicacion
 	and c.habilitado = 1
 	and c.eliminado = 0
-	and cast(c.fecha_creacion as datetime) > cast(@fecha as datetime)
+	and c.fecha_creacion > @fecha
 END
 GO
 
@@ -545,8 +545,8 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	insert into Comentario(texto,id_usuario,id_publicacion)
-	values	(@texto, @id_usuario, @id_publicacion)
+	insert into Comentario(texto,id_usuario,id_publicacion, fecha_creacion)
+	values	(@texto, @id_usuario, @id_publicacion, CONVERT(VARCHAR(10), GETDATE(), 103) + ' '  + convert(VARCHAR(8), GETDATE(), 14))
 END
 GO
 

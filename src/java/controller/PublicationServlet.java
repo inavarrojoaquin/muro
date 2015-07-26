@@ -3,11 +3,17 @@ package controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import static java.lang.System.console;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -81,7 +87,7 @@ public class PublicationServlet extends HttpServlet {
         
         String id_wall = request.getParameter("id_wall");
         String text = request.getParameter("text");
-        String id_user = request.getParameter("id_user");
+        String id_user = request.getParameter("id_user");        
         String _method = request.getParameter("method");
         
         if(_method != null){
@@ -93,6 +99,7 @@ public class PublicationServlet extends HttpServlet {
         }else if(id_wall != null && text != null && id_user != null){
             boolean insertOk = publicationService.insertPublication(text, Short.parseShort(id_wall), id_user);
             if(insertOk){
+                saveImage(text);
                 response.getWriter().write("{\"mensaje\":\"Publicacion insertada correctamente\"}");
             }else {
                 response.getWriter().write("{\"error\":\"Error de insercion de la publicacion\"}");
@@ -149,4 +156,44 @@ public class PublicationServlet extends HttpServlet {
     public String getServletInfo() {
         return "Publication Servlet";
     }// </editor-fold>
+    
+    /**Validate if the param is an image and save in the local disc*/
+    public static void saveImage(String text) throws IOException {
+        String[] split = text.split("\\^");
+               
+        if(split.length > 1 ){
+            boolean isImage = validateImage(split[1]);
+        
+            if(isImage){
+                String imageUrl = split[1];
+                URL url = new URL(imageUrl);
+                String fileName = url.getFile();
+                String destName = "C:/Users/jn_fe_000/Git/muro/web/img" + fileName.substring(fileName.lastIndexOf("/"));
+                System.out.println(destName);
+
+                InputStream is = url.openStream();
+                OutputStream os = new FileOutputStream(destName);
+
+                byte[] b = new byte[2048];
+                int length;
+
+                while ((length = is.read(b)) != -1) {
+                        os.write(b, 0, length);
+                }
+
+                is.close();
+                os.close();
+            }
+        }
+    }
+    
+    public static boolean validateImage(String imageUrl){
+           Pattern pattern;
+	   Matcher matcher;
+           
+	   pattern = Pattern.compile("([^\\s]+(\\.(?i)(/bmp|jpg|gif|png))$)");
+
+           matcher = pattern.matcher(imageUrl);
+           return matcher.matches();
+    }
 }

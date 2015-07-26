@@ -37,24 +37,30 @@ public class LoginServlet extends HttpServlet {
         String id_user = request.getParameter("id_user");
         String password = request.getParameter("password");
 
-        session = request.getSession();
-        UserDTO userDTO = loginService.login(id_user, password);
-        boolean updateOK = loginService.updateDate(id_user);
-     
-        if (userDTO != null && updateOK == true) {
-            session.setAttribute("id_user", userDTO.getIdUsuario());
-            session.setAttribute("userName", userDTO.getNombre()+" "+userDTO.getApellido());
-            session.setAttribute("id_role", userDTO.getIdRol());
-//            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/muro.jsp");
-//            dispatcher.forward(request,response);
-            response.sendRedirect("muro.jsp");
-        } else {
-            String error = "No se encontro el usuario";
-            session.setAttribute("error", error);
-            response.sendRedirect("error.jsp");
-//            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/error.jsp");
-//            dispatcher.include(request,response);
+        if(id_user != null & password != null){
+            session = request.getSession();
+            UserDTO userDTO = loginService.login(id_user, password);
+            boolean updateOK = loginService.updateDate(id_user);
+            
+            if (userDTO != null && updateOK == true) {
+                session.setAttribute("id_user", userDTO.getIdUsuario());
+                session.setAttribute("userName", userDTO.getNombre()+" "+userDTO.getApellido());
+                session.setAttribute("id_role", userDTO.getIdRol());
+                session.setAttribute("lastAccessDate", userDTO.getFechaAcceso());
+    //            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/muro.jsp");
+    //            dispatcher.forward(request,response);
+                response.sendRedirect("muro.jsp");
+            } else {
+                String error = "No se encontro el usuario";
+                session.setAttribute("error", error);
+                response.sendRedirect("error.jsp");
+    //            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/error.jsp");
+    //            dispatcher.include(request,response);
+            }
         }
+        
+     
+        
     }
 
     @Override

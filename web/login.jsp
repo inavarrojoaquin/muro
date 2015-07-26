@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>   <%--Boostrap css--%>
         <link rel="stylesheet" href="css/login.css">
     </head>
-    <body style="background-color: darkcyan">
+    <body>
         <section>
             <div class="container">
                 <div class="login-box jumbotron col-md-4 col-md-offset-4">
