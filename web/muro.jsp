@@ -1,5 +1,5 @@
+<%@page import="service.instances.LoginService"%>
 <% if(session.getAttribute("id_user") == null) response.sendRedirect("login.jsp"); %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,8 +9,16 @@
         <title>Muro</title>
         <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>   <%--Boostrap css--%>
         <link rel="stylesheet" href="css/main.css">
+        
     </head>
     <body id="page-top">
+        <% 
+            LoginService loginService = new LoginService();
+            String id_user = (String)session.getAttribute("id_user");
+            /** Update last Date in database */
+            boolean updateOK = loginService.updateDate(id_user); 
+        %>
+        
         <%-- HEADER --%>
         <header>
             <nav class="navbar navbar-default navbar-static-top navbar-inverse">
@@ -21,15 +29,22 @@
                     <%-- INIT MENU --%>
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
-                            <li role="presentation"><a href="#page-top">Inicio</a></li>
+                            <li role="presentation">
+                                <button type="button" class="btn navbar-btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Publications <span class="badge" id="publication_count"></span> <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" id="publication_menu"></ul>
+                            </li>
                             <li role="presentation"><a href="logout.do">Logout</a></li>
                         </ul>
                     </div>
                 </div>
             </nav>
+                    
             <input type="hidden" name="id_user" value="${id_user}" >
             <input type="hidden" name="userName" value="${userName}" >
             <input type="hidden" name="id_role" value="${id_role}" >
+            
         </header>
         <%-- MAIN WINDOW --%>
         <section class="main container">
@@ -83,5 +98,6 @@
         <script src="js/jquery.2.1.4.js" type="text/javascript"></script>
         <script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script> <%--Boostrap js--%>
         <script src="js/script.js"  type="text/javascript"></script>
+                    
     </body>
 </html>

@@ -285,7 +285,7 @@ BEGIN
 	SET NOCOUNT OFF;
 
     -- Insert statements for procedure here
-	select top 5 p.id_publicacion, p.texto, p.likes, p.id_usuario, pe.nombre, p.fecha_publicacion
+	select top 5 p.id_publicacion, p.texto, p.likes, p.id_usuario, pe.nombre+' '+pe.apellido as nombre, p.fecha_publicacion
 	from Publicacion p 
 	join AccesoUsuario au on p.id_usuario = au.id_usuario
 	join Persona pe on au.dni_persona = pe.dni_persona

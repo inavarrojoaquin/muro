@@ -2,12 +2,18 @@ $(document).ready(function(){
     var id_user = $("input[name=id_user]").val();
     var userName = $("input[name=userName]").val();
     var id_role = $("input[name=id_role]").val();
+    var date = new Date();
+    var lastAccessDateSession = sessionStorage.setItem("lastAccessDateSession", getFormattedDate(date));
     var selectionCareer = "";
     var selectionSubject = "";
     var id_careerSelected;
     var id_subjectSelected;
     var id_wall = -1;
     var endDatePublication = "";
+    
+    var id_careerSession = sessionStorage.getItem("id_career");
+    var id_wallSession = sessionStorage.getItem("id_wall");
+    var lastAccessDate = sessionStorage.getItem("lastAccessDateSession");
 
     /**Load facebook API*/
     $.getScript('templates/facebookAPI.js', function(){});
@@ -21,10 +27,14 @@ $(document).ready(function(){
  * */
 
     //Reload muro's publications every 5 minutes
-    setInterval(getLast5Publications, 300000); // 1min = 60000 , 3min = 180000, 5min = 300000 
-
+    setInterval(getLast5Publications, 15000); // 1min = 60000 , 3min = 180000, 5min = 300000 
+    
     /**Generate careers list*/
-    generateCareerList();
+    generateCareerList().then(function(){
+        if(id_careerSession != null){
+            $("#career-list").find("a[data-id-career='"+id_careerSession+"']").click ();           
+        }        
+    });
     
     /** Generate subjects list*/
     $("#career-list").on("click", "a", function(){
@@ -35,7 +45,12 @@ $(document).ready(function(){
             cleanPublications();
             selectionCareer = careerName;
             id_careerSelected = $(this).attr('data-id-career');
-            generateSubjectList(id_careerSelected);
+            sessionStorage.setItem("id_career", id_careerSelected);
+            generateSubjectList(id_careerSelected).then(function(){
+                if(id_wallSession != null){
+                        $("#subjects").find("a[data-id-wall='"+id_wallSession+"']").click ();
+                    }
+            });
        }else {
             showAlert("La carrera ya fue seleccionada", "alert-danger");
        }
@@ -48,6 +63,7 @@ $(document).ready(function(){
        id_wall = $(this).attr('data-id-wall');
        if(selectionSubject !== subjectText & enableWall == true){
            selectionSubject = subjectText;
+           sessionStorage.setItem("id_wall", id_wall);
            showInsertPublication();
            cleanPublications();
            publicationProcess(id_wall, id_user);
@@ -82,8 +98,8 @@ $(document).ready(function(){
     });
 
     /**When the user clicks in button send publication*/
-    $("[data-action='send-publication']").on('click', function(){
-            sendPublicationToInsert();
+    $("[data-action='send-publication']").on('click', function(){  
+        sendPublicationToInsert();
     });
 
     /**When the user press Enter in text comment to insert*/
@@ -134,6 +150,7 @@ $(document).ready(function(){
         promiseLike
                 .then(function(vector){
                     if(!vector.error){
+                        rankPublication(id_publicationToInsert);
                         likeName.text('Esto te gusta');
                         countLikeElement.text(valueLike);
                         disableButton.attr('disabled', true);
@@ -152,12 +169,173 @@ $(document).ready(function(){
         if(dataName == 'facebook'){
             //function in FacebookAPI
             shareFacebookPublication(id_publication, id_user, publicationText);
+            rankPublication(id_publication);
         }else{
             //function in TwitterAPI
             shareTwitterPublication(id_publication, id_user, publicationText);
+            rankPublication(id_publication);
         }
         return false;
     });
+    
+    /**Insert new publication in the wall*/
+    function sendPublicationToInsert(){
+        var maxLength = 150;
+        var contentText = $.trim($("#text-publication-to-insert").val());
+        var contentLink = $.trim($("#link-publication-to-insert").val());
+        var fullContentLink = (contentLink !== "") ? "^"+contentLink :"";
+        var finalContent = contentText + fullContentLink;
+        if(finalContent.length === 0 || finalContent.length > maxLength){
+             showAlert("Contenido vacio o mayor a 150 caracteres", "alert-danger");
+        }else {
+            insertPublication(finalContent, id_wall, id_user);
+        }
+    };
+    
+    /**The process get id_muro then get and show the muro's publications*/
+    function publicationProcess(id_wall, id_user){
+        var promisePublication = callAJAX('publication.do', {id_wall:id_wall, id_user:id_user}); //AJAX return a promise
+        promisePublication
+                .then(function(vector){
+                    if(!vector.error){
+                        loadPublications(vector);                        
+                    }else {
+                        showAlert(vector.error, "alert-danger");
+                        showInsertPublication();
+                        
+                    }
+                });
+    }
+    
+    function loadPublicationsAlert(vector){
+        var $publication_count = $("#publication_count");
+        var $publication_menu = $("#publication_menu");
+
+        var count = parseInt($publication_count.text());
+        var finalCount = isNaN(count) ? vector.length : count + vector.length; 
+        $publication_count.text(finalCount);
+
+        vector.forEach(function(publication){
+            var $publication_item = $("<li><a href='#" + publication.id_publicacion + "'>" + publication.texto + "</a></li>");
+            $publication_menu.append($publication_item);  
+        });
+    }
+    
+    /**Load publications in muro*/
+    function loadPublications(vector){
+        for(var i = 0; i < vector.length; i++) {
+            var id_publication = vector[i].id_publicacion;
+            var publicationText = vector[i].texto;
+            var publicationLikes = vector[i].likes;
+            var likeName = vector[i].userLike;
+            var publicationIdUser = vector[i].id_usuario;
+            var publicationUserName = vector[i].nombreUsuario;
+            console.log(publicationUserName);
+            var publicationDate = vector[i].fecha_publicacion;
+            var isLike = (likeName == "Esto te gusta") ? "disabled": "";
+            var isStudent = (id_role == 3 || id_role == 1)? "hide" : "";
+            endDatePublication = publicationDate; //revisar, posible eliminacion
+            
+            var accessDate = Date.parse(lastAccessDate); 
+            var pubDate = Date.parse(publicationDate); 
+             
+            var commentList = vector[i].commentList;
+            var cantComments = 0;
+            if(commentList !== null){
+                cantComments = commentList.length;
+            }   
+            
+            var result = publicationText.split('^');
+            var contentText = result[0];
+            var contentLink = (result[1] != null) ? result[1] : "";
+
+            var content = detectContent(contentLink);
+            
+            $("#publications").prepend("<article data-id-publication='"+id_publication+"' id='"+id_publication+"'  class='publication clearfix'>\n\
+                            <input type='hidden' name='publicationText' value='"+publicationText+"' >\n\
+                                <div class='dropdown pull-right' >\n\
+                                    <button class='btn btn-default btn-xs dropdown-toggle "+isStudent+"' type='button' id='optionsPublication' data-toggle='dropdown' aria-expanded='true'>\n\
+                                    <span class='caret'></span></button>\n\
+                                    <ul class='dropdown-menu dropdown-menu-right' role='menu' aria-labelledby='optionsPublication'>\n\
+                                        <li role='presentation'><a role='item' href='#' data-name='options' data-action='publication'>Eliminar</a></li>\n\
+                                    </ul>\n\
+                                </div>\n\
+                            <div class='publication-info'>\n\
+                                <p><span> " + publicationDate + " </span> publicado por: <strong data-owner='owner'>" + publicationUserName +"</strong> </p>\n\
+                            </div>\n\
+                            <div>\n\
+                                <p class='publication-comment'>"+contentText+"</p>\n\
+                            </div>\n\
+                            <div class='row'>"+content+"</div>\n\
+                            <div class='like-comment-panel'>\n\
+                                <div class='form-group'>\n\
+                                    <button class='likePublication btn btn-primary btn-sm' type='button' name='like' "+isLike+" ><span data-name='likeName'>"+likeName+"</span> <span class='badge' data-name='countLike'>"+publicationLikes+"</span></button>\n\
+                                    <a data-share='facebook'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/31Gnichxt/facebook.png' title='Facebook' ></a>\n\
+                                    <a data-share='twitter' href='http://twitter.com/intent/tweet?text="+publicationText+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'></a>\n\
+                                </div>\n\
+                                <div class='form-group'>\n\
+                                    <div class='input-group col-md-8'>\n\
+                                        <input type='text' class='form-control' name='textComment' placeholder='Ingrese comentario'>\n\
+                                        <span class='input-group-btn'>\n\
+                                            <input type='button' class='btn btn-primary' name='submitComment' value='Comentar'>\n\
+                                        </span>\n\
+                                    </div>\n\
+                                </div>\n\
+                            </div>\n\
+                            <div class='comments-panel'>\n\
+                                <a href='#button"+id_publication+"' class='btn btn-default btn-sm' data-toggle='collapse'>Comentarios <span class='badge' data-name='cant-comments'>"+cantComments+"</span></a>\n\
+                                <div class='collapse' id='button"+id_publication+"'>\n\
+                                    <div class='well'>\n\
+                                        <ul class='comment-list'></ul>\n\
+                                    </div>\n\
+                                </div>\n\
+                            </div>\n\
+                        </article>");
+              loadCommentsInPublication(commentList);
+              if(accessDate <= pubDate){
+                  changePublicationColor(id_publication);
+              }
+        }
+    }
+
+
+    /**Generate subjects list when the user clicks on career*/
+    function generateSubjectList(id_careerSelected){
+        var promiseSubject = callAJAX('subject.do', {id_career:id_careerSelected});
+        return promiseSubject
+                .then(function(vector){
+                    if(!vector.error){
+                        loadSubjectList(vector);
+                    }else{
+                        showAlert(vector.error, "alert-danger");
+                    }
+                });
+    };
+
+    /**Load subject list*/
+    function loadSubjectList(vector){
+        $("#subject-list").empty();
+        for(var i = 0; i < vector.length; i++) {
+            var id_subject = vector[i].id_materia;
+            var subjectName = vector[i].nombre;
+            var wallName = vector[i].muro;
+            var id_wall = wallName.id_muro;
+            var enable = wallName.habilitado;
+            var checked = (enable) ? "checked" : "";
+
+            var hideCheckbox = (id_role == 3 || id_role == 1) ? "hide" : "";
+            var tableNone = (id_role == 3 || id_role == 1) ? "style='display: inline'" : "";
+
+            $("#subject-list").append("<div class='input-group' "+tableNone+">\n\
+                                        <span class='input-group-addon "+hideCheckbox+"'>\n\
+                                            <label>\n\
+                                                <input type='checkbox' data-name='wall_enable' "+checked+" > Habilitado\n\
+                                            </label>\n\
+                                        </span>\n\
+                                        <a href='#' class='list-group-item form-control' data-id-subject='"+id_subject+"' data-id-wall='"+id_wall+"'>"+subjectName+"</a></div>");
+        }
+    }
+
     
     /**Insert publication in the actual muro*/
     function insertPublication(content,id_wall, id_user){
@@ -173,20 +351,6 @@ $(document).ready(function(){
                     }
                 });
     }
-    
-    /**Insert new publication in the wall*/
-    function sendPublicationToInsert(){
-        var maxLength = 150;
-        var contentText = $.trim($("#text-publication-to-insert").val());
-        var contentLink = $.trim($("#link-publication-to-insert").val());
-        var fullContentLink = (contentLink !== "") ? "^"+contentLink :"";
-        var finalContent = contentText + fullContentLink;
-        if(finalContent.length === 0 || finalContent.length > maxLength){
-             showAlert("Contenido vacio o mayor a 150 caracteres", "alert-danger");
-        }else {
-            insertPublication(finalContent, id_wall, id_user);
-        }
-    };
     
     /**Insert new comment in one particular publication*/
     function sendCommentToInsert(element){
@@ -205,6 +369,7 @@ $(document).ready(function(){
                             if(!vector.error){
                                 input.val('');
                                 console.log("comentario insertado...");
+                                rankPublication(id_publication);
                                 commentsListByPublication(id_publication, lastDateComment, countCommentsElement);
                             }else {
                                 showAlert(vector.error, "alert-danger");
@@ -220,9 +385,8 @@ $(document).ready(function(){
             promiseTopPublications
                     .then(function(vector){
                         if(!vector.error){
+                            loadPublicationsAlert(vector);
                             loadPublications(vector);
-                        }else {
-                            showAlert(vector.error, "alert-danger");
                         }
                     });
         }        
@@ -276,134 +440,12 @@ $(document).ready(function(){
         }
     }
     
-    /**Generate subjects list when the user clicks on career*/
-    function generateSubjectList(id_careerSelected){
-        var promiseSubject = callAJAX('subject.do', {id_career:id_careerSelected});
-        promiseSubject
-                .then(function(vector){
-                    if(!vector.error){
-                        loadSubjectList(vector);
-                    }else{
-                        showAlert(vector.error, "alert-danger");
-                    }
-                });
-    };
-    
-    /**Load subject list*/
-    function loadSubjectList(vector){
-        $("#subject-list").empty();
-        for(var i = 0; i < vector.length; i++) {
-            var id_subject = vector[i].id_materia;
-            var subjectName = vector[i].nombre;
-            var wallName = vector[i].muro;
-            var id_wall = wallName.id_muro;
-            var enable = wallName.habilitado;
-            var checked = (enable) ? "checked" : "";
-            
-            var disableForEstudent = (id_role == 3 || id_role == 1) ? "disabled" : "";
-
-            $("#subject-list").append("<div class='input-group'>\n\
-                                        <span class='input-group-addon'>\n\
-                                            <label>\n\
-                                                <input type='checkbox' data-name='wall_enable' "+disableForEstudent+" "+checked+" > Habilitado\n\
-                                            </label>\n\
-                                        </span>\n\
-                                        <a href='#' class='list-group-item form-control' data-id-subject='"+id_subject+"' data-id-wall='"+id_wall+"'>"+subjectName+"</a></div>");
-        }
-    }
-    
-    /**The process get id_muro then get and show the muro's publications*/
-    function publicationProcess(id_wall, id_user){
-        var promisePublication = callAJAX('publication.do', {id_wall:id_wall, id_user:id_user}); //AJAX return a promise
-        promisePublication
-                .then(function(vector){
-                    if(!vector.error){
-                        //showInsertPublication();
-                        loadPublications(vector);
-                        //hideOptionsMenu();
-                    }else {
-                        showAlert(vector.error, "alert-danger");
-                        showInsertPublication();
-                        
-                    }
-                });
-    }
-    
-    /**Load publications in muro*/
-    function loadPublications(vector){
-        for(var i = 0; i < vector.length; i++) {
-            var id_publication = vector[i].id_publicacion;
-            var publicationText = vector[i].texto;
-            var publicationLikes = vector[i].likes;
-            var likeName = vector[i].userLike;
-            var publicationIdUser = vector[i].id_usuario;
-            var publicationUserName = vector[i].nombreUsuario;
-            var publicationDate = vector[i].fecha_publicacion;
-            var isLike = (likeName == "Esto te gusta") ? "disabled": "";
-            var isStudent = (id_role == 3 || id_role == 1)? "hide" : "";
-            endDatePublication = publicationDate; //revisar, posible eliminacion
-            
-            var commentList = vector[i].commentList;
-            var cantComments = 0;
-            if(commentList !== null){
-                cantComments = commentList.length;
-            }   
-            
-            var result = publicationText.split('^');
-            var contentText = result[0];
-            var contentLink = (result[1] != null) ? result[1] : "";
-
-            var content = detectContent(contentLink);
-            
-            $("#publications").prepend("<article data-id-publication='"+id_publication+"' class='publication clearfix'>\n\
-                            <input type='hidden' name='publicationText' value='"+publicationText+"' >\n\
-                                <div class='dropdown pull-right' >\n\
-                                    <button class='btn btn-default btn-xs dropdown-toggle "+isStudent+"' type='button' id='optionsPublication' data-toggle='dropdown' aria-expanded='true'>\n\
-                                    <span class='caret'></span></button>\n\
-                                    <ul class='dropdown-menu dropdown-menu-right' role='menu' aria-labelledby='optionsPublication'>\n\
-                                        <li role='presentation'><a role='item' href='#' data-name='options' data-action='publication'>Eliminar</a></li>\n\
-                                    </ul>\n\
-                                </div>\n\
-                            <div class='publication-info'>\n\
-                                <p><span> " + publicationDate + " </span> publicado por: <strong data-owner='owner'>" + publicationUserName +"</strong> </p>\n\
-                            </div>\n\
-                            <div>\n\
-                                <p class='publication-comment'>"+contentText+"</p>\n\
-                            </div>\n\
-                            <div class='row'>"+content+"</div>\n\
-                            <div class='like-comment-panel'>\n\
-                                <div class='form-group'>\n\
-                                    <button class='likePublication btn btn-primary btn-sm' type='button' name='like' "+isLike+" ><span data-name='likeName'>"+likeName+"</span> <span class='badge' data-name='countLike'>"+publicationLikes+"</span></button>\n\
-                                    <a data-share='facebook'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/31Gnichxt/facebook.png' title='Facebook' ></a>\n\
-                                    <a data-share='twitter' href='http://twitter.com/intent/tweet?text="+publicationText+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'></a>\n\
-                                </div>\n\
-                                <div class='form-group'>\n\
-                                    <div class='input-group col-md-8'>\n\
-                                        <input type='text' class='form-control' name='textComment' placeholder='Ingrese comentario'>\n\
-                                        <span class='input-group-btn'>\n\
-                                            <input type='button' class='btn btn-primary' name='submitComment' value='Comentar'>\n\
-                                        </span>\n\
-                                    </div>\n\
-                                </div>\n\
-                            </div>\n\
-                            <div class='comments-panel'>\n\
-                                <a href='#button"+id_publication+"' class='btn btn-default btn-sm' data-toggle='collapse'>Comentarios <span class='badge' data-name='cant-comments'>"+cantComments+"</span></a>\n\
-                                <div class='collapse' id='button"+id_publication+"'>\n\
-                                    <div class='well'>\n\
-                                        <ul class='comment-list'></ul>\n\
-                                    </div>\n\
-                                </div>\n\
-                            </div>\n\
-                        </article>");
-              loadCommentsInPublication(commentList);
-        }
-    }
 });
 
 /**Generate career list when the page load*/
 function generateCareerList() {
     var promiseCareer = callAJAX('career.do');
-    promiseCareer
+    return promiseCareer
             .then(function (vector) {
                 if (!vector.error) {
                     for (var i = 0; i < vector.length; i++) {
@@ -429,9 +471,10 @@ function detectContent(text) {
         if(!oneLink){
             if(url.match(imageRegex)){
                 oneLink = true;
+                var nameImage = url.substr(url.lastIndexOf("/"));
                 return "<div class='col-md-5'>\n\
                             <div class='thumbnail'>\n\
-                                <img src='"+url+"'>\n\
+                                <img src='img"+nameImage+"'>\n\
                             </div>\n\
                         </div>";
             }else if(url.match(vimeoRegex)){
@@ -524,12 +567,10 @@ function showAlert(message, alert_type) {
     }, 3000);
 }
 
-/**Se ejecuta cuando la alerta se cierra*/
-//function afterShowAlert(){
-//    $('.alert-message').on('closed.bs.alert', function () {
-//              //showalert('De nuevo', 'alert-danger');
-//});
-//}
+function getFormattedDate(dt){
+    return dt.getDate() + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear() + " " +dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+}
+
 function showInsertPublication(){
     $("#insert-form-publication").show();
 }
@@ -545,6 +586,16 @@ function cleanPublications(){
 function cleanContentToInsert(){
     $("#text-publication-to-insert").val("");
     $("#link-publication-to-insert").val("");
+}
+
+function changePublicationColor(id_publication){
+    $("#publications").find('article[data-id-publication="'+id_publication+'"]').css("background-color", "lightblue");
+}
+
+function rankPublication(id_publication){
+    var topDOM = $("#publications").find('article[data-id-publication="'+id_publication+'"]');
+    $('html, body').animate({ scrollTop: 0 }, 'slow');
+    $("#publications").prepend(topDOM);
 }
 
 /**Remove publication of the DOM*/

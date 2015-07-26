@@ -40,9 +40,8 @@ public class LoginServlet extends HttpServlet {
         if(id_user != null & password != null){
             session = request.getSession();
             UserDTO userDTO = loginService.login(id_user, password);
-            boolean updateOK = loginService.updateDate(id_user);
             
-            if (userDTO != null && updateOK == true) {
+            if (userDTO != null) {
                 session.setAttribute("id_user", userDTO.getIdUsuario());
                 session.setAttribute("userName", userDTO.getNombre()+" "+userDTO.getApellido());
                 session.setAttribute("id_role", userDTO.getIdRol());

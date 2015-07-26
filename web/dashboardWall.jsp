@@ -39,7 +39,7 @@
                     <div class="list-group">
                         <a href="#" class="list-group-item list-group-item-heading active">Materias</a>
                         <div>
-                            <div class="input-group">
+                            <div class="input-group" >
                                <span class="input-group-addon">
                                    <label>
                                        <input type="checkbox"> Habilitado
