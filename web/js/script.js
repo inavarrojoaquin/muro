@@ -268,7 +268,7 @@ $(document).ready(function(){
                                 <div class='form-group'>\n\
                                     <button class='likePublication btn btn-primary btn-sm' type='button' name='like' "+isLike+" ><span data-name='likeName'>"+likeName+"</span> <span class='badge' data-name='countLike'>"+publicationLikes+"</span></button>\n\
                                     <a data-share='facebook'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/31Gnichxt/facebook.png' title='Facebook' ></a>\n\
-                                    <a data-share='twitter' href='http://twitter.com/intent/tweet?text="+publicationText+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'></a>\n\
+                                    <a href='http://twitter.com/intent/tweet?text="+contentText+contentLink+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'></a>\n\
                                 </div>\n\
                                 <div class='form-group'>\n\
                                     <div class='input-group col-md-8'>\n\
