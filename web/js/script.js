@@ -160,11 +160,11 @@ $(document).ready(function(){
    });
    
    /**When the user clicks in facebook or twitter icon in one publicacion to share*/
-    $("#publications").on('click','[data-share]', function(){
+    $("#publications").on('click','.like-comment-panel a', function(){
         var dataName = $(this).data('share');
         var id_publication = $(this).parents('article').attr('data-id-publication');
         var publicationText = $(this).parents('article').find('input[name="publicationText"]').val();
-                
+
         if(dataName == 'facebook'){
             //function in FacebookAPI
             shareFacebookPublication(id_publication, id_user, publicationText);
