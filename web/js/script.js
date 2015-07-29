@@ -129,7 +129,8 @@ $(document).ready(function(){
                         deletePublication(id_publication);
                   }else{
                        var id_comment = $(this).parents('div .comment').attr('data-id-comment');
-                       deleteComment(id_publication, id_comment);
+                       var countCommentsElement = $(this).parents('div .comments-panel').find('[data-name="cant-comments"]');
+                       deleteComment(id_publication, id_comment, countCommentsElement);
                   }
                   break;
         }
@@ -160,7 +161,7 @@ $(document).ready(function(){
    });
    
    /**When the user clicks in facebook or twitter icon in one publicacion to share*/
-    $("#publications").on('click','.like-comment-panel a', function(){
+    $("#publications").on('click','[data-share]', function(){
         var dataName = $(this).data('share');
         var id_publication = $(this).parents('article').attr('data-id-publication');
         var publicationText = $(this).parents('article').find('input[name="publicationText"]').val();
@@ -174,7 +175,6 @@ $(document).ready(function(){
             shareTwitterPublication(id_publication, id_user, publicationText);
             rankPublication(id_publication);
         }
-        return false;
     });
     
     /**Insert new publication in the wall*/
@@ -182,7 +182,16 @@ $(document).ready(function(){
         var maxLength = 150;
         var contentText = $.trim($("#text-publication-to-insert").val());
         var contentLink = $.trim($("#link-publication-to-insert").val());
-        var fullContentLink = (contentLink !== "") ? "^"+contentLink :"";
+        var fullContentLink = "";
+        if(contentLink !== ""){
+            var isUrl = urlRegex(contentLink);
+            if(isUrl){
+                fullContentLink = (isUrl) ? "^"+contentLink :"";
+            }else {
+                alert("Ingrese una url correcta. ej: https://www.google.com.ar");
+                return false;
+            }
+        }
         var finalContent = contentText + fullContentLink;
         if(finalContent.length === 0 || finalContent.length > maxLength){
              showAlert("Contenido vacio o mayor a 150 caracteres", "alert-danger");
@@ -268,7 +277,7 @@ $(document).ready(function(){
                                 <div class='form-group'>\n\
                                     <button class='likePublication btn btn-primary btn-sm' type='button' name='like' "+isLike+" ><span data-name='likeName'>"+likeName+"</span> <span class='badge' data-name='countLike'>"+publicationLikes+"</span></button>\n\
                                     <a data-share='facebook'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/31Gnichxt/facebook.png' title='Facebook' ></a>\n\
-                                    <a href='http://twitter.com/intent/tweet?text="+contentText+contentLink+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'></a>\n\
+                                    <a data-share='twitter' href='http://twitter.com/intent/tweet?text="+contentText+contentLink+"'><img height='30' width='30' src='http://static.tumblr.com/r14jw9y/JfEnichyk/twitter.png' title='Twitter'></a>\n\
                                 </div>\n\
                                 <div class='form-group'>\n\
                                     <div class='input-group col-md-8'>\n\
@@ -342,7 +351,7 @@ $(document).ready(function(){
                 then(function(data){
                     if(!data.error){
                         cleanContentToInsert();
-                        showAlert(data.mensaje, "alert-success");
+                        //showAlert(data.mensaje, "alert-success");
                         getLast5Publications();
                     }else {
                         showAlert(data.error, "alert-danger");
@@ -456,6 +465,12 @@ function generateCareerList() {
             });
 }
 
+/**Detect if the url is a real URL*/
+function urlRegex(url){
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return url.match(urlRegex) ? true : false;
+}   
+
 /**Function that detect content in each publication*/
 function detectContent(text) {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -531,12 +546,14 @@ function deletePublication(id_publication){
 }
 
 /**Delete the selected comment in one publication*/
-function deleteComment(id_publication, id_comment){
+function deleteComment(id_publication, id_comment, element){
     var promiseDeleteComment = callAJAX('comment.do', {id_comment:id_comment, method:'delete'}, 'POST');
     promiseDeleteComment
             .then(function(data){
                 if(!data.error){
-                    //showAlert(data.mensaje, "alert-success");
+                    if(element != null){
+                        element.text( parseInt(element.text()) - 1);
+                    }
                     deleteDivComment(id_publication, id_comment);
                 }else {
                     showAlert(data.error, "alert-danger");

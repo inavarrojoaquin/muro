@@ -591,3 +591,30 @@ BEGIN
 	values	(@id_publicacion, @id_usuario_comparte, @texto, @destino)
 END
 GO
+
+
+IF OBJECT_ID ('proc_getCommentsByBeingEndDate') IS NOT NULL
+   DROP PROCEDURE proc_getCommentsByBeingEndDate
+GO
+/*Retorna los comentarios despues de la fecha*/
+CREATE PROCEDURE proc_getCommentsByBeingEndDate
+	-- Add the parameters for the stored procedure here
+	@fechaDesde varchar(20),
+	@fechaHasta varchar(20)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT OFF;
+
+	-- Insert statements for procedure here
+	IF @fechaDesde = '' and @fechaHasta = ''
+	BEGIN
+		set @fechaDesde = '01/01/2015'
+		set @fechaHasta = GETDATE()
+	END
+
+	select p.id_publicacion from Publicacion p
+	where CONVERT(date, p.fecha_publicacion, 103) between CONVERT(date, @fechaDesde, 103) and CONVERT(date, @fechaHasta, 103)
+END
+GO
